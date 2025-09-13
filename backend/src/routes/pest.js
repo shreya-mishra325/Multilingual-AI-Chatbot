@@ -1,6 +1,6 @@
 import express from "express";
-import { getPestAdvice } from "../services/pestService.js";
-import { translateText } from "../services/translatorService.js";
+import {getPestAdvice} from "../services/pestService.js";
+import {translateText} from "../services/translatorService.js";
 
 const router = express.Router();
 
@@ -18,16 +18,12 @@ router.post("/ask", async (req, res) => {
   if (crop) pestContext.crop = crop;
 
   const messageInEnglish =
-    language && language !== "en"
-      ? await translateText(message, "en")
-      : message;
+    language && language !== "en" ? await translateText(message, "en") : message;
 
   const adviceInEnglish = await getPestAdvice(messageInEnglish, pestContext);
 
   const finalResponse =
-    language && language !== "en"
-      ? await translateText(adviceInEnglish, language)
-      : adviceInEnglish;
+    language && language !== "en" ? await translateText(adviceInEnglish, language) : adviceInEnglish;
 
   pestChatHistory.push({ user: message, bot: finalResponse });
 

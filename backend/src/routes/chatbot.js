@@ -18,17 +18,9 @@ router.post("/chat", async (req, res) => {
     userContext.village = village;
   }
 
-  const messageInEnglish =
-    language && language !== "en"
-      ? await translateText(message, "en")
-      : message;
-
+  const messageInEnglish = language && language !== "en" ? await translateText(message, "en") : message;
   const aiResponseInEnglish = await getAIResponse(messageInEnglish, userContext);
-
-  const finalResponse =
-    language && language !== "en"
-      ? await translateText(aiResponseInEnglish, language)
-      : aiResponseInEnglish;
+  const finalResponse = language && language !== "en" ? await translateText(aiResponseInEnglish, language) : aiResponseInEnglish;
 
   chatHistory.push({ user: message, bot: finalResponse });
 

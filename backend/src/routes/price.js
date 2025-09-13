@@ -1,6 +1,6 @@
 import express from "express";
-import { getPriceAdvisory } from "../services/priceService.js";
-import { translateText } from "../services/translatorService.js";
+import {getPriceAdvisory} from "../services/priceService.js";
+import {translateText} from "../services/translatorService.js";
 
 const router = express.Router();
 
@@ -12,9 +12,7 @@ router.post("/advisory", async (req, res) => {
   }
 
   const advisoryInEnglish = await getPriceAdvisory(commodity, state, district);
-  const finalAdvisory = language && language !== "en"
-    ? await translateText(advisoryInEnglish, language)
-    : advisoryInEnglish;
+  const finalAdvisory = language && language !== "en" ? await translateText(advisoryInEnglish, language) : advisoryInEnglish;
 
   res.send(finalAdvisory);
 });
