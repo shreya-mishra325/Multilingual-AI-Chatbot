@@ -1,0 +1,50 @@
+{
+  "soil_data": {
+    "alluvial": {
+      "soil_type": "Alluvial Soil",
+      "crops": "🌾 Wheat, 🍚 Rice, 🏭 Sugarcane, 🌱 Pulses, 🌽 Maize, 🥜 Oilseeds",
+      "fertilizers": "Use balanced NPK (Nitrogen-Phosphorus-Potassium) and organic manure. Split application improves efficiency.",
+      "notes": "Highly fertile and found in river basins. Retains moisture well."
+    },
+    "black": {
+      "soil_type": "Black Soil",
+      "crops": "🌿 Cotton, 🌻 Sunflower, 🌱 Soybean, 🌾 Sorghum, 🌰 Groundnut",
+      "fertilizers": "Rich in minerals but needs extra phosphorus and nitrogen for better yield.",
+      "notes": "Also called Regur soil. Cracks in summer help aeration."
+    },
+    "red": {
+      "soil_type": "Red Soil",
+      "crops": "🍅 Groundnut, 🌾 Millets, 🌱 Pulses, 🌶️ Chilies, 🍠 Potato",
+      "fertilizers": "Add nitrogen fertilizers and compost for best results.",
+      "notes": "Low in nitrogen and humus. Needs organic matter to boost fertility."
+    },
+    "laterite": {
+      "soil_type": "Laterite Soil",
+      "crops": "🌱 Tea, ☕ Coffee, 🌴 Cashew, 🌾 Millets",
+      "fertilizers": "Apply organic manure and green manuring frequently, as soil is less fertile.",
+      "notes": "Common in high rainfall areas. Leached soil, acidic in nature."
+    },
+    "desert": {
+      "soil_type": "Desert Soil",
+      "crops": "🌴 Bajra, 🌾 Barley, 🌱 Drought-resistant pulses, 🌿 Aloe vera",
+      "fertilizers": "Needs nitrogen fertilizers and drip irrigation for better results.",
+      "notes": "Found in arid regions. Very low in moisture and organic matter."
+    }
+  },
+
+  "location_mapping": {
+    "Patna": "alluvial",
+    "Lucknow": "alluvial",
+    "Delhi": "alluvial",
+    "Nagpur": "black",
+    "Indore": "black",
+    "Hyderabad": "red",
+    "Bangalore": "red",
+    "Goa": "laterite",
+    "Shillong": "laterite",
+    "Jaipur": "desert",
+    "Jaisalmer": "desert",
+    "Bikaner": "desert"
+  }
+}
+
