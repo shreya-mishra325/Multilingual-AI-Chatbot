@@ -37,7 +37,7 @@ export default function QuickActions() {
           <Link
             to={action.link}
             key={i}
-            className="p-5 rounded-xl bg-white dark:bg-gray-800 shadow hover:shadow-md transition flex items-center gap-4"
+            className="p-5 rounded-xl bg-white dark:bg-gray-900 shadow hover:shadow-md transition flex items-center gap-4"
           >
             {action.icon}
             <div>

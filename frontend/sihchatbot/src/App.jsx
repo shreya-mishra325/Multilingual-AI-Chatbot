@@ -1,10 +1,12 @@
+import React from "react";
 import { Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
+import Navbar from "./components/navbar";
+import Hero from "./components/hero";
+import WeatherForecast from "./components/WeatherForecast";
 import QuickActions from "./components/QuickActions";
 import Footer from "./components/Footer";
 
-// Pages
+
 import SoilAnalysisPage from "./pages/SoilAnalysispage";
 import MandiPricesPage from "./pages/Mandipricespage";
 import CropGuidesPage from "./pages/CropGuidespage";
@@ -21,11 +23,12 @@ function App() {
           element={
             <>
               <Hero />
+              <WeatherForecast/>
               <QuickActions />
             </>
           }
         />
-        {/* Section Pages */}
+        
         <Route path="/soil-analysis" element={<SoilAnalysisPage />} />
         <Route path="/mandi-prices" element={<MandiPricesPage />} />
         <Route path="/crop-guides" element={<CropGuidesPage />} />
