@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import Navbar from "./components/navbar";
-import Hero from "./components/hero";
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
 import WeatherForecast from "./components/WeatherForecast";
 import QuickActions from "./components/QuickActions";
 import Footer from "./components/Footer";
@@ -10,7 +10,8 @@ import Footer from "./components/Footer";
 import SoilAnalysisPage from "./pages/SoilAnalysispage";
 import MandiPricesPage from "./pages/Mandipricespage";
 import CropGuidesPage from "./pages/CropGuidespage";
-import ChatbotPage from "./pages/Chatbotpage";
+import Chatbot from "./pages/Chatbot"
+// import ChatbotPage from "./pages/Chatbotpage";
 
 function App() {
   return (
@@ -32,7 +33,7 @@ function App() {
         <Route path="/soil-analysis" element={<SoilAnalysisPage />} />
         <Route path="/mandi-prices" element={<MandiPricesPage />} />
         <Route path="/crop-guides" element={<CropGuidesPage />} />
-        <Route path="/chatbot" element={<ChatbotPage />} />
+        <Route path="/chatbot" element={<Chatbot />} />
       </Routes>
       <Footer />
     </div>
