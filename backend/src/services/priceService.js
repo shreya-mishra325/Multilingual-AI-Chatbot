@@ -3,27 +3,23 @@ import path from "path";
 import csv from "csv-parser";
 
 const csvPath = path.join(process.cwd(), "src/data/price_data.csv");
-console.log("CSV file exists?", fs.existsSync(csvPath));
+let cachedData = [];
 
-async function readCSVFallback(commodity, state, district) {
-  const results = [];
-  return new Promise((resolve) => {
-    fs.createReadStream(path.join(process.cwd(), "src/data/price_data.csv"))
+function loadCSV() {
+  return new Promise((resolve, reject) => {
+    const results = [];
+    fs.createReadStream(csvPath)
       .pipe(csv())
       .on("data", (row) => results.push(row))
       .on("end", () => {
-        const record = results.find(
-  (r) =>
-    r.Commodity?.toLowerCase() === commodity.toLowerCase() &&
-    (!state || r.State?.toLowerCase() === state.toLowerCase()) &&
-    (!district || r.District?.toLowerCase() === district.toLowerCase())
-);
-
-
-        resolve(record || null);
-      });
+        cachedData = results;
+        console.log(`✅ Loaded ${results.length} price records`);
+        resolve();
+      })
+      .on("error", reject);
   });
 }
+await loadCSV();
 
 export async function getPriceAdvisory(commodity, state, district) {
   try {
@@ -31,23 +27,30 @@ export async function getPriceAdvisory(commodity, state, district) {
 
     console.log("getPriceAdvisory called with:", commodity, state, district);
 
-    const record = await readCSVFallback(commodity, state, district);
-    console.log("CSV record found:", record);
+    const matches = cachedData.filter(
+      (r) =>
+        r.Commodity?.toLowerCase() === commodity.toLowerCase() &&
+        (!state || r.State?.toLowerCase().includes(state.toLowerCase())) &&
+        (!district || r.District?.toLowerCase().includes(district.toLowerCase()))
+    );
 
-    if (!record) {
+    if (matches.length === 0) {
       return `❌ Sorry, no price data available for ${commodity} in ${district || state || "your area"}.`;
     }
 
-    return (
-      `🌾 In ${record.District} (${record.State}), ${record.Commodity} is selling at:\n` +
-      `Minimum: ₹${record.Min_x0020_Price} per quintal\n` +
-      `Maximum: ₹${record.Max_x0020_Price} per quintal\n` +
-      `Modal: ₹${record.Modal_x0020_Price} per quintal\n` +
-      `Mandi: ${record.Market}`
-);
+    return matches
+      .map(
+        (r) =>
+          `📍 ${r.District}, ${r.State} - ${r.Market}\n` +
+          `🌾 ${r.Commodity}\n` +
+          `• Minimum: ₹${r.MinPrice} per quintal\n` +
+          `• Maximum: ₹${r.MaxPrice} per quintal\n` +
+          `• Modal: ₹${r.ModalPrice} per quintal`
+      )
+      .join("\n\n");
 
   } catch (error) {
+    console.error("Error in getPriceAdvisory:", error.message);
     return "❌ Sorry, I faced an issue while fetching price data. Please try again later.";
   }
 }
-

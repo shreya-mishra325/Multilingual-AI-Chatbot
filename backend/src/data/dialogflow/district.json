@@ -1,0 +1,20 @@
+{
+  "id": "district-entity",
+  "name": "district",
+  "isOverridable": true,
+  "isEnum": false,
+  "isRegexp": false,
+  "automatedExpansion": true,
+  "allowFuzzyExtraction": true,
+  "entries": [
+    { "value": "Krishna", "synonyms": ["Krishna"] },
+    { "value": "Guntur", "synonyms": ["Guntur"] },
+    { "value": "Chandigarh", "synonyms": ["Chandigarh"] },
+    { "value": "Patna", "synonyms": ["Patna"] },
+    { "value": "Kanpur", "synonyms": ["Kanpur"] },
+    { "value": "Nagpur", "synonyms": ["Nagpur"] },
+    { "value": "Jaipur", "synonyms": ["Jaipur"] },
+    { "value": "Lucknow", "synonyms": ["Lucknow"] },
+    { "value": "Bhubaneswar", "synonyms": ["Bhubaneswar"] }
+  ]
+}

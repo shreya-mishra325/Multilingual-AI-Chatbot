@@ -1,0 +1,26 @@
+{
+  "Wheat": {
+    "pests": ["Aphids", "Armyworm", "Termites", "Cutworms"],
+    "control": "🌿 Spray neem oil extract. 🐞 Encourage ladybird beetles. 💧 Avoid waterlogging. 💊 If severe, apply imidacloprid or chlorpyrifos."
+  },
+  "Rice": {
+    "pests": ["Brown planthopper", "Stem borer", "Leaf folder", "Gall midge"],
+    "control": "🌱 Maintain proper spacing. 🐦 Encourage ducks/birds. 🌿 Use neem-based pesticides. 💊 If heavy infestation, spray triazophos or cartap hydrochloride."
+  },
+  "Cotton": {
+    "pests": ["Bollworm", "Aphids", "Whitefly", "Jassids"],
+    "control": "🪤 Use pheromone traps. 🌿 Spray Bt formulation. 🐞 Release Trichogramma. 💊 If severe, spray spinosad or thiamethoxam."
+  },
+  "Maize": {
+    "pests": ["Fall armyworm", "Stem borer", "Shoot fly", "Cutworm"],
+    "control": "🌱 Sowing in clusters reduces attack. 🌿 Spray neem extracts. 🪤 Use pheromone traps. 💊 Apply emamectin benzoate for severe infestations."
+  },
+  "Paddy": {
+    "pests": ["Rice hispa", "Leaf folder", "Rice bug", "Caseworm"],
+    "control": "💧 Keep fields flooded properly. 🐦 Encourage birds/fish. 🌿 Spray neem oil. 💊 Apply chlorantraniliprole or fipronil if needed."
+  },
+  "Vegetables": {
+    "pests": ["Fruit borer", "Whitefly", "Aphids", "Thrips"],
+    "control": "🌿 Neem seed kernel extract. 🐞 Encourage lacewings. 🪤 Use sticky traps. 💊 Spray emamectin benzoate or spinosad for severe cases."
+  }
+}

@@ -3,4 +3,4 @@ A clean multilingual AI chatbot  with weather + soil advisory + voice support th
 
 backend deployed on: https://multilingual-ai-chatbot.onrender.com/
 
-frontend deployed url:https://ai-multilingual-chatbot.vercel.app/
+frontend deployed on: https://ai-multilingual-chatbot.vercel.app/

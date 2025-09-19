@@ -1,0 +1,21 @@
+{
+  "id": "state-entity",
+  "name": "state",
+  "isOverridable": true,
+  "isEnum": false,
+  "isRegexp": false,
+  "automatedExpansion": true,
+  "allowFuzzyExtraction": true,
+  "entries": [
+    { "value": "Andhra Pradesh", "synonyms": ["Andhra Pradesh", "AP"] },
+    { "value": "Punjab", "synonyms": ["Punjab"] },
+    { "value": "Odisha", "synonyms": ["Odisha", "Orissa"] },
+    { "value": "Maharashtra", "synonyms": ["Maharashtra", "MH"] },
+    { "value": "Uttar Pradesh", "synonyms": ["Uttar Pradesh", "UP"] },
+    { "value": "Madhya Pradesh", "synonyms": ["Madhya Pradesh", "MP"] },
+    { "value": "Gujarat", "synonyms": ["Gujarat"] },
+    { "value": "Bihar", "synonyms": ["Bihar"] },
+    { "value": "Rajasthan", "synonyms": ["Rajasthan"] },
+    { "value": "Karnataka", "synonyms": ["Karnataka"] }
+  ]
+}

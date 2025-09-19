@@ -1,0 +1,20 @@
+{
+  "id": "commodity-entity",
+  "name": "commodity",
+  "isOverridable": true,
+  "isEnum": false,
+  "isRegexp": false,
+  "automatedExpansion": true,
+  "allowFuzzyExtraction": true,
+  "entries": [
+    { "value": "maize", "synonyms": ["maize", "corn"] },
+    { "value": "wheat", "synonyms": ["wheat"] },
+    { "value": "rice", "synonyms": ["rice", "paddy"] },
+    { "value": "cotton", "synonyms": ["cotton"] },
+    { "value": "sugarcane", "synonyms": ["sugarcane"] },
+    { "value": "soybean", "synonyms": ["soybean", "soya"] },
+    { "value": "barley", "synonyms": ["barley"] },
+    { "value": "mustard", "synonyms": ["mustard", "sarson"] },
+    { "value": "pulses", "synonyms": ["pulses", "dal", "lentils"] }
+  ]
+}
