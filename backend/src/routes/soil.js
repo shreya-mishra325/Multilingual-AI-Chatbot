@@ -1,8 +1,8 @@
 import express from "express";
-import { getSoilAdvisory } from "../services/soilAdvisory.js";
-import { translateText } from "../services/translatorService.js";
-import { getAIResponse } from "../services/geminiService.js";
-import { detectIntent } from "../services/dialogFlowService.js";
+import {getSoilAdvisory} from "../services/soilAdvisory.js";
+import {translateText} from "../services/translatorService.js";
+import {getAIResponse} from "../services/geminiService.js";
+import {detectIntent} from "../services/dialogFlowService.js";
 
 const router = express.Router();
 
@@ -47,8 +47,7 @@ router.post("/", async (req, res) => {
     const advisoryQuery = crop || soilType || village || query;
     if (!advisoryQuery) {
       const msg = "❌ Please provide a soil type, crop name, or village.";
-      const reply =
-        language && language !== "en" ? await translateText(msg, language) : msg;
+      const reply = language && language !== "en" ? await translateText(msg, language) : msg;
       return res.status(400).setHeader("Content-Type", "text/plain").send(reply);
     }
 
@@ -56,8 +55,7 @@ router.post("/", async (req, res) => {
     if (isGenericAdvice(advice)) {
       console.log("Generic soil advisory detected, using AI fallback.");
 
-      const aiPrompt = `
-You are a helpful farming assistant.
+      const aiPrompt = `You are a helpful farming assistant.
 Provide short, direct soil advisory in 1–2 sentences.
 Include crop-specific and fertilizer tips if applicable.
 Do NOT ask a question and do NOT repeat the user query.
@@ -89,14 +87,9 @@ Provide advice for the following: ${crop || "unknown crop"}, ${soilType || "unkn
       }
       return res.setHeader("Content-Type", "text/plain").send(aiReply);
     } catch {
-      const msg =
-        "❌ Sorry, I couldn't fetch soil advisory right now. Please try again later.";
-      const reply =
-        language && language !== "en" ? await translateText(msg, language) : msg;
-      return res
-        .status(500)
-        .setHeader("Content-Type", "text/plain")
-        .send(reply);
+      const msg = "❌ Sorry, I couldn't fetch soil advisory right now. Please try again later.";
+      const reply = language && language !== "en" ? await translateText(msg, language) : msg;
+      return res.status(500).setHeader("Content-Type", "text/plain").send(reply);
     }
   }
 });

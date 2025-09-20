@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { getAIResponse } from "./geminiService.js";
+import {getAIResponse} from "./geminiService.js";
 
 const soilDataPath = path.join(process.cwd(), "src/data/soil.json");
 const soilJson = JSON.parse(fs.readFileSync(soilDataPath, "utf-8"));
