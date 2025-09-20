@@ -1,8 +1,18 @@
-import dialogflow from '@google-cloud/dialogflow';
+import dotenv from "dotenv";
+import dialogflow from "@google-cloud/dialogflow";
 import { v4 as uuidv4 } from "uuid";
 
+dotenv.config();
+
 const projectId = process.env.DIALOGFLOW_PROJECT_ID;
-const sessionClient = new dialogflow.SessionsClient();
+
+const sessionClient = new dialogflow.SessionsClient({
+  projectId,
+  credentials: {
+    client_email: process.env.DIALOGFLOW_CLIENT_EMAIL,
+    private_key: process.env.DIALOGFLOW_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  },
+});
 
 function parseParameters(fields) {
   const entities = {};
@@ -17,9 +27,11 @@ function parseParameters(fields) {
     } else if (field.boolValue !== undefined) {
       entities[key] = field.boolValue;
     } else if (field.listValue) {
-      entities[key] = field.listValue.values.map(v => v.stringValue || v.numberValue);
+      entities[key] = field.listValue.values.map(
+        (v) => v.stringValue || v.numberValue
+      );
     } else if (field.structValue) {
-      entities[key] = parseParameters(field.structValue.fields); 
+      entities[key] = parseParameters(field.structValue.fields);
     }
   }
 
@@ -49,6 +61,3 @@ export async function detectIntent(text, languageCode = "en") {
     entities,
   };
 }
-
-
-
