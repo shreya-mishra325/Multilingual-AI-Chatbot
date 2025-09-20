@@ -1,8 +1,8 @@
 import express from "express";
-import { getPriceAdvisory } from "../services/priceService.js";
-import { translateText } from "../services/translatorService.js";
-import { detectIntent } from "../services/dialogFlowService.js";
-import { getAIResponse } from "../services/geminiService.js";
+import {getPriceAdvisory} from "../services/priceService.js";
+import {translateText} from "../services/translatorService.js";
+import {detectIntent} from "../services/dialogFlowService.js";
+import {getAIResponse} from "../services/geminiService.js";
 
 const router = express.Router();
 
@@ -61,11 +61,11 @@ router.post("/advisory", async (req, res) => {
 
     try {
       const aiPrompt = `You are a helpful farming assistant.
-              Provide a short, direct price advisory for farmers.
-              Crop: ${commodity || "unknown"}
-              State: ${state || ""}
-              District: ${district || ""}
-              `;        
+            Provide a short, direct price advisory for farmers.
+            Crop: ${commodity || "unknown"}
+            State: ${state || ""}
+            District: ${district || ""}
+            `;        
       let aiReply = await getAIResponse(aiPrompt);
 
       if (language && language !== "en") {

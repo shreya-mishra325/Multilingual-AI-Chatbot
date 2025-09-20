@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import axios from "axios";
 import dotenv from "dotenv";
-import { translateText } from "./translatorService.js";
+import {translateText} from "./translatorService.js";
 
 dotenv.config();
 
@@ -13,57 +13,57 @@ const pestsDataPath = path.join(process.cwd(), "src/data/pests.json");
 const pestsJson = JSON.parse(fs.readFileSync(pestsDataPath, "utf-8"));
 
 export async function getPestAdvice(userMessage, options = {}) {
-  const { language = "en" } = options;
+  const {language = "en"} = options;
 
-  try {
-    const input = userMessage.toLowerCase();
-    for (const [crop, details] of Object.entries(pestsJson)) {
-      if (input.includes(crop.toLowerCase())) {
-        let advice = `🐛 **Pest Advisory for ${crop}**\n\n` +
-                     `⚠️ Common pests: ${details.pests.join(", ")}\n` +
-                     `💡 Control tips: ${details.control}`;
+try {
+  const input = userMessage.toLowerCase();
+  for (const [crop, details] of Object.entries(pestsJson)) {
+    if (input.includes(crop.toLowerCase())) {
+      let advice = `🐛 **Pest Advisory for ${crop}**\n\n` +
+                    `⚠️ Common pests: ${details.pests.join(", ")}\n` +
+                    `💡 Control tips: ${details.control}`;
 
-        if (language && language !== "en") {
-          try {
-            advice = await translateText(advice, language);
-          } catch (err) {
-            console.error("Translation error:", err.message);
-          }
+      if (language && language !== "en") {
+        try {
+          advice = await translateText(advice, language);
+        } catch (err) {
+          console.error("Translation error:", err.message);
         }
-
-        return advice;
       }
+
+      return advice;
     }
-    const payload = {
-      contents: [
-        {
-          role: "user",
-          parts: [
-            {
-              text: `Provide pest management advice in 70 words point wise with emojis for: ${userMessage}`
-            }
-          ]
-        }
-      ]
-    };
-
-    const response = await axios.post(GEMINI_API_URL, payload);
-    let aiAdvice = response.data.candidates[0].content.parts[0].text;
-
-    if (language && language !== "en") {
-      try {
-        aiAdvice = await translateText(aiAdvice, language);
-      } catch (err) {
-        console.error("Translation error:", err.message);
-      }
-    }
-
-    return aiAdvice;
-
-  } catch (error) {
-    console.error("Error in pestService:", error.message);
-    return "❌ Sorry, I am unable to provide pest advice right now.";
   }
+  const payload = {
+    contents: [
+      {
+        role: "user",
+        parts: [
+          {
+            text: `Provide pest management advice in 70 words point wise with emojis for: ${userMessage}`
+          }
+        ]
+      }
+    ]
+  };
+
+  const response = await axios.post(GEMINI_API_URL, payload);
+  let aiAdvice = response.data.candidates[0].content.parts[0].text;
+
+  if (language && language !== "en") {
+    try {
+      aiAdvice = await translateText(aiAdvice, language);
+    } catch (err) {
+      console.error("Translation error:", err.message);
+    }
+  }
+
+  return aiAdvice;
+
+} catch (error) {
+  console.error("Error in pestService:", error.message);
+  return "❌ Sorry, I am unable to provide pest advice right now.";
+}
 }
 
 

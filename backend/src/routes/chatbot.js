@@ -17,7 +17,7 @@ const COMMON_STATES = ["Punjab", "Haryana", "Bihar", "Maharashtra"];
 const COMMON_DISTRICTS = ["Ludhiana", "Mohali", "Ropar", "Patiala"];
 
 router.post("/chat", async (req, res) => {
-  const { message, village, state, district, language, userId } = req.body;
+  const {message, village, state, district, language, userId} = req.body;
 
   if (!message || !message.trim())
   return res.status(400).json({ error: "Message is required" });
@@ -41,13 +41,13 @@ router.post("/chat", async (req, res) => {
     catch { messageInEnglish = message; }
   }
 
-  let nlpOutput = { intent: "unknown", entities: {} };
+  let nlpOutput = {intent: "unknown", entities: {}};
   try {
     const dfResponse = await detectIntent(messageInEnglish);
     nlpOutput.intent = dfResponse.intent || "unknown";
     nlpOutput.entities = dfResponse.entities || {};
   } catch {
-    try { nlpOutput = await getAIResponse(messageInEnglish, userCtx, { mode: "intent" }); }
+    try { nlpOutput = await getAIResponse(messageInEnglish, userCtx, { mode: "intent"}); }
     catch { nlpOutput.intent = "unknown"; nlpOutput.entities = {}; }
   }
 
@@ -117,11 +117,9 @@ router.post("/chat", async (req, res) => {
         - Crops: ${userCtx.crops.join(", ") || "none"}
         - Important facts: ${userCtx.keyFacts.slice(-5).join("; ") || "none"}
 
-        Answer the user message concisely:
-        "${messageInEnglish}"
-        `;
+        Answer the user message concisely: "${messageInEnglish}"`;
 
-        const aiResponse = await getAIResponse(contextPrompt, userCtx, { mode: "text" });
+        const aiResponse = await getAIResponse(contextPrompt, userCtx, {mode: "text"});
         finalResponse = language !== "en" ? await translateText(aiResponse, language) : aiResponse;
         backendJSON.action = "gemini_context_aware";
         const commodityMatch = finalResponse.match(new RegExp(COMMON_CROPS.join("|"), "i"));
@@ -141,7 +139,7 @@ router.post("/chat", async (req, res) => {
     }
   }
 
-  chatHistory.push({ userId, user: message, bot: finalResponse });
+  chatHistory.push({userId, user: message, bot: finalResponse});
   userCtx.keyFacts.push(`User asked: ${message}`);
   if (userCtx.keyFacts.length > 10) userCtx.keyFacts.shift();
 
@@ -154,6 +152,5 @@ router.delete("/history", (req, res) => {
   userContext = {};
   res.json({ message: "Chat history and user context cleared successfully." });
 });
-
 
 export default router;

@@ -1,6 +1,6 @@
 import express from "express";
-import { getPestAdvice } from "../services/pestService.js";
-import { translateText } from "../services/translatorService.js";
+import {getPestAdvice} from "../services/pestService.js";
+import {translateText} from "../services/translatorService.js";
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ router.post("/ask", async (req, res) => {
   const { message, village, crop, language } = req.body;
 
   if (!message || !message.trim()) {
-    return res.status(400).json({ error: "Message is required" });
+    return res.status(400).json({error: "Message is required"});
   }
 
   if (village) pestContext.village = village;
@@ -26,11 +26,9 @@ router.post("/ask", async (req, res) => {
         { language }
       );
     }
-    const finalResponse = extraAdvice
-      ? `${mainAdvice}\n\n🤖 Extra AI Tips:\n${extraAdvice}`
-      : mainAdvice;
+    const finalResponse = extraAdvice ? `${mainAdvice}\n\n🤖 Extra AI Tips:\n${extraAdvice}`: mainAdvice;
 
-    pestChatHistory.push({ user: message, bot: finalResponse });
+    pestChatHistory.push({user: message, bot: finalResponse});
 
     res.json({ response: finalResponse });
   } catch (err) {

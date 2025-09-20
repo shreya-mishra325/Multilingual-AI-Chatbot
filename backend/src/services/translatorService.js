@@ -1,4 +1,4 @@
-import { translate } from "@vitalets/google-translate-api";
+import {translate} from "@vitalets/google-translate-api";
 
 export async function translateText(text, targetLang) {
   try {
