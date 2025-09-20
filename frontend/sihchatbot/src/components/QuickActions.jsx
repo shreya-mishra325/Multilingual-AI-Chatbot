@@ -4,6 +4,12 @@ import { Link } from "react-router-dom";
 export default function QuickActions() {
   const actions = [
     {
+      title: "Farming Chatbot",
+      description: "Ask AI assistant for farming tips",
+      icon: <Bot className="w-6 h-6 text-orange-600" />,
+      link: "/chatbot",
+    },
+    {
       title: "Soil Analysis",
       description: "Take photo & get instant analysis",
       icon: <Camera className="w-6 h-6 text-green-600" />,
@@ -20,13 +26,7 @@ export default function QuickActions() {
       description: "Learn about growing different crops",
       icon: <Leaf className="w-6 h-6 text-purple-600" />,
       link: "/crop-guides",
-    },
-    {
-      title: "Farming Chatbot",
-      description: "Ask AI assistant for farming tips",
-      icon: <Bot className="w-6 h-6 text-orange-600" />,
-      link: "/chatbot",
-    },
+    }
   ];
 
   return (

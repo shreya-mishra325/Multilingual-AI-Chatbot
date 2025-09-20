@@ -8,10 +8,10 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Home", path: "/" },
+    { name: "Chatbot", path: "/chatbot" },
     { name: "Soil Analysis", path: "/soil-analysis" },
     { name: "Mandi Prices", path: "/mandi-prices" },
-    { name: "Crop Guides", path: "/crop-guides" },
-    { name: "Chatbot", path: "/chatbot" },
+    { name: "Crop Guides", path: "/crop-guides" }
   ];
 
   return (
