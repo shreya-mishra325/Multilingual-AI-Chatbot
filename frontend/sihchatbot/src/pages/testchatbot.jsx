@@ -1,162 +1,163 @@
-import { useState, useEffect } from "react";
-import { Mic, Send } from "lucide-react";
+import { useState } from "react";
 
 export default function Chatbot() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const [listening, setListening] = useState(false);
-  const [voices, setVoices] = useState([]);
-  const [selectedLang, setSelectedLang] = useState("en-US");
+  const [selectedLang, setSelectedLang] = useState("en");
+  const [currentAction, setCurrentAction] = useState(null); // 🔹 tracks last quick action
 
-  const BACKEND_URL = " https://multilingual-ai-chatbot.onrender.com/api/chat"; 
-  // ⬆ replace with your actual backend endpoint
+  const quickActions = [
+    {
+      label: "🌾 Mandi Prices",
+      text: "Tell me about prices of bottle gourd,Chandigarh",
+      url: "https://multilingual-ai-chatbot.onrender.com/price/advisory",
+      type: "query",
+    },
+    {
+      label: "🌱 Farming Tips",
+      text: "Give me farming tips",
+      url: "https://multilingual-ai-chatbot.onrender.com/api/chat",
+      type: "message",
+    },
+    {
+      label: "🐛 Pest Control",
+      text: "How to control pests in crops?",
+      url: "https://multilingual-ai-chatbot.onrender.com/api/pest/ask",
+      type: "message",
+    },
+    {
+      label: "💧 Weather",
+      text: "give me today's weather summary",
+      url: "https://multilingual-ai-chatbot.onrender.com/weather/advisory",
+      type: "message",
+    },
+  ];
 
-  useEffect(() => {
-    const loadVoices = () => {
-      setVoices(speechSynthesis.getVoices());
+  const speakMessage = (message, lang) => {
+    const speech = new SpeechSynthesisUtterance(message);
+    speech.lang = lang === "hi" ? "hi-IN" : "en-US";
+    window.speechSynthesis.speak(speech);
+  };
+
+  const sendMessage = async (userMessage) => {
+    if (!userMessage.trim()) return;
+
+    // Determine URL and type: use currentAction or default to chat
+    const action = currentAction || {
+      url: "https://multilingual-ai-chatbot.onrender.com/api/chat",
+      type: "message",
     };
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-  }, []);
 
-  // Send message
-  const sendMessage = async () => {
-    if (!input.trim()) return;
-
-    // Add user message to chat
-    setMessages((prev) => [...prev, { text: input, sender: "user" }]);
-    const userMessage = input;
-    setInput("");
+    setMessages((prev) => [...prev, { text: userMessage, sender: "user" }]);
 
     try {
-      // Call backend API
-      const res = await fetch(BACKEND_URL, {
+      let body;
+      if (action.type === "query") {
+        body = { query: userMessage, language: selectedLang === "hi" ? "hi-IN" : "en" };
+      } else {
+        body = { message: userMessage };
+      }
+
+      const res = await fetch(action.url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage }), // adjust key if backend expects different
+        body: JSON.stringify(body),
       });
 
-      const data = await res.json();
-      console.log("Backend response:",data)
-      const reply = data.response || "Sorry, I didn’t understand that."; 
+      const text = await res.text();
 
-      // Add bot reply
+      let reply;
+      try {
+        const data = JSON.parse(text);
+        reply = data.reply || data.message || data.response || text;
+      } catch {
+        reply = text;
+      }
+
       setMessages((prev) => [...prev, { text: reply, sender: "bot" }]);
-
-      // Speak reply
       speakMessage(reply, selectedLang);
     } catch (error) {
       console.error("Error talking to backend:", error);
-      const failMsg = "⚠ Unable to reach server. Please try again.";
-      setMessages((prev) => [...prev, { text: failMsg, sender: "bot" }]);
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") sendMessage();
-  };
-
-  // 🎤 Voice input
-  const startListening = () => {
-    if (!("webkitSpeechRecognition" in window)) {
-      alert("Speech recognition not supported in this browser.");
-      return;
+      setMessages((prev) => [
+        ...prev,
+        { text: "⚠️ Unable to reach server", sender: "bot" },
+      ]);
     }
 
-    const recognition = new window.webkitSpeechRecognition();
-    recognition.lang = selectedLang;
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
-    recognition.onstart = () => setListening(true);
-    recognition.onend = () => setListening(false);
-    recognition.onerror = () => setListening(false);
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setInput(transcript);
-    };
-
-    recognition.start();
+    setInput("");
   };
 
-  // 🔊 Voice output
-  const speakMessage = (message, lang) => {
-    const utterance = new SpeechSynthesisUtterance(message);
-    utterance.lang = lang;
-
-    const match = voices.find((v) => v.lang === lang);
-    if (match) utterance.voice = match;
-
-    speechSynthesis.speak(utterance);
+  const handleQuickAction = (action) => {
+    // Set the current action so Send button knows where to send
+    setCurrentAction(action);
+    // Also immediately send the quick action text
+    sendMessage(action.text);
   };
 
   return (
-    <div className="flex flex-col h-[85vh] w-full max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden">
-      
-      <div className="p-3 sm:p-4 bg-green-600 text-white font-bold text-lg sm:text-xl text-center">
-        Farming Assistant Chatbot 🌾
+    <div className="m-6 flex flex-col h-screen w-full max-w-lg mx-auto border rounded-lg shadow-lg bg-white dark:bg-gray-900 dark:text-white transition-colors">
+      {/* Header */}
+      <div className="p-3 border-b flex justify-between items-center bg-green-600 text-white dark:bg-green-700">
+        <h2 className="text-lg font-bold">🌾 Farming Assistant</h2>
+        <select
+          value={selectedLang}
+          onChange={(e) => setSelectedLang(e.target.value)}
+          className="text-black dark:text-white bg-white dark:bg-gray-800 px-2 py-1 rounded"
+        >
+          <option value="en">English</option>
+          <option value="hi">हिंदी</option>
+        </select>
       </div>
 
-      <div className="flex-1 p-3 sm:p-4 space-y-3 overflow-y-auto">
-        {messages.map((msg, i) => (
+      {/* Chat Messages */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-gray-50 dark:bg-gray-800">
+        {messages.map((msg, idx) => (
           <div
-            key={i}
-            className={`p-2 sm:p-3 rounded-xl max-w-[85%] sm:max-w-xs break-words ${
-              msg.sender === "user"
-                ? "bg-green-500 text-white self-end ml-auto"
-                : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 self-start"
-            }`}
+            key={idx}
+            className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
           >
-            {msg.text}
+            <div
+              className={`p-2 rounded-lg max-w-xs break-words ${
+                msg.sender === "user"
+                  ? "bg-green-500 text-white dark:bg-green-600"
+                  : "bg-gray-300 dark:bg-gray-700 dark:text-white"
+              }`}
+            >
+              {msg.text}
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="p-2 sm:p-3 border-t border-gray-300 dark:border-gray-700 flex flex-col sm:flex-row items-center gap-2">
-        <select
-          className="w-full sm:w-auto p-2 rounded-lg border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-          value={selectedLang}
-          onChange={(e) => setSelectedLang(e.target.value)}
+      {/* Quick Actions */}
+      <div className="p-2 border-t flex flex-wrap gap-2 bg-gray-100 dark:bg-gray-800">
+        {quickActions.map((action, idx) => (
+          <button
+            key={idx}
+            onClick={() => handleQuickAction(action)}
+            className="px-3 py-1 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
+          >
+            {action.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Input Area */}
+      <div className="p-3 border-t flex gap-2 bg-white dark:bg-gray-900">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Ask something..."
+          className="flex-1 border rounded-lg px-3 py-2 bg-white dark:bg-gray-800 dark:text-white"
+          onKeyDown={(e) => e.key === "Enter" && sendMessage(input)}
+        />
+        <button
+          onClick={() => sendMessage(input)}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
         >
-          <option value="en-US">English (US)</option>
-          <option value="hi-IN">Hindi (India)</option>
-          <option value="bn-IN">Bengali (India)</option>
-          <option value="ta-IN">Tamil (India)</option>
-          <option value="te-IN">Telugu (India)</option>
-          <option value="kn-IN">Kannada (India)</option>
-        </select>
-
-        <div className="flex items-center gap-2 w-full">
-          <button
-            onClick={startListening}
-            className={`p-2 rounded-full ${
-              listening
-                ? "bg-red-500 text-white animate-pulse"
-                : "bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-100"
-            }`}
-            title="Start Voice Input"
-          >
-            <Mic size={20} />
-          </button>
-
-          <input
-            type="text"
-            className="flex-1 p-2 rounded-lg border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Ask me about farming..."
-          />
-
-          <button
-            onClick={sendMessage}
-            className="p-2 bg-green-500 text-white rounded-full"
-            title="Send"
-          >
-            <Send size={20} />
-          </button>
-        </div>
+          Send
+        </button>
       </div>
     </div>
   );

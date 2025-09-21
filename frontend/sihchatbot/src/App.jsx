@@ -10,7 +10,7 @@ import Footer from "./components/Footer";
 import SoilAnalysisPage from "./pages/SoilAnalysispage";
 import MandiPricesPage from "./pages/Mandipricespage";
 import CropGuidesPage from "./pages/CropGuidespage";
-import Chatbot from "./pages/newchatbot"
+import Chatbot from "./pages/testchatbot"
 // import ChatbotPage from "./pages/Chatbotpage";
 
 function App() {
