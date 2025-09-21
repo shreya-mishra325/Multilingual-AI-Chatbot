@@ -26,16 +26,44 @@ export async function getPriceAdvisory(commodity, state, district) {
     if (!commodity) return "❌ Please provide a commodity.";
 
     console.log("getPriceAdvisory called with:", commodity, state, district);
+    state = state && state.toLowerCase() !== "unknown" ? state : null;
+    district = district && district.toLowerCase() !== "unknown" ? district : null;
 
-    const matches = cachedData.filter(
-      (r) =>
-        r.Commodity?.toLowerCase() === commodity.toLowerCase() &&
-        (!state || r.State?.toLowerCase().includes(state.toLowerCase())) &&
-        (!district || r.District?.toLowerCase().includes(district.toLowerCase()))
-    );
+    let matches = [];
 
-    if (matches.length === 0) {
-      return `❌ Sorry, no price data available for ${commodity} in ${district || state || "your area"}.`;
+    if (state && district) {
+      matches = cachedData.filter(
+        (r) =>
+          r.Commodity?.toLowerCase() === commodity.toLowerCase() &&
+          r.State?.toLowerCase() === state.toLowerCase() &&
+          r.District?.toLowerCase() === district.toLowerCase()
+      );
+    }
+    if (!matches.length && district) {
+      matches = cachedData.filter(
+        (r) =>
+          r.Commodity?.toLowerCase() === commodity.toLowerCase() &&
+          r.District?.toLowerCase() === district.toLowerCase()
+      );
+    }
+    if (!matches.length && state) {
+      matches = cachedData.filter(
+        (r) =>
+          r.Commodity?.toLowerCase() === commodity.toLowerCase() &&
+          r.State?.toLowerCase() === state.toLowerCase()
+      );
+    }
+
+    if (!matches.length) {
+      matches = cachedData.filter(
+        (r) => r.Commodity?.toLowerCase() === commodity.toLowerCase()
+      );
+    }
+
+    if (!matches.length) {
+      return `❌ Sorry, no price data available for ${commodity}${
+        district ? " in " + district : state ? " in " + state : ""
+      }.`;
     }
 
     return matches
@@ -48,7 +76,6 @@ export async function getPriceAdvisory(commodity, state, district) {
           `• Modal: ₹${r.ModalPrice} per quintal`
       )
       .join("\n\n");
-
   } catch (error) {
     console.error("Error in getPriceAdvisory:", error.message);
     return "❌ Sorry, I faced an issue while fetching price data. Please try again later.";
