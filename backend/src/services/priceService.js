@@ -13,7 +13,6 @@ function loadCSV() {
       .on("data", (row) => results.push(row))
       .on("end", () => {
         cachedData = results;
-        console.log(`✅ Loaded ${results.length} price records`);
         resolve();
       })
       .on("error", reject);
@@ -71,6 +70,7 @@ export async function getPriceAdvisory(commodity, state, district) {
         (r) =>
           `📍 ${r.District}, ${r.State} - ${r.Market}\n` +
           `🌾 ${r.Commodity}\n` +
+          `• Arrival Date: ${r.Arrival_Date}\n` +
           `• Minimum: ₹${r.MinPrice} per quintal\n` +
           `• Maximum: ₹${r.MaxPrice} per quintal\n` +
           `• Modal: ₹${r.ModalPrice} per quintal`

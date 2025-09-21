@@ -23,16 +23,16 @@ export async function getSoilAdvisory(query) {
       const mentionedCrop = soil.crops.find(c => userInput.includes(c.toLowerCase()));
 
       return `📍 In ${foundLocation}, the soil is mostly ${soil.soil_type}.
-🌱 Recommended crops: ${soil.crops.join(", ")}.
-💡 Fertilizer tip: ${soil.fertilizers}
-${mentionedCrop ? `✅ Yes, "${mentionedCrop}" grows well here.` : ""}`;
+      🌱 Recommended crops: ${soil.crops.join(", ")}.
+      💡 Fertilizer tip: ${soil.fertilizers}
+      ${mentionedCrop ? `✅ Yes, "${mentionedCrop}" grows well here.` : ""}`;
     }
   }
 
   for (const [soilType, details] of Object.entries(soilData)) {
     if (details.crops.some(c => userInput.includes(c.toLowerCase()))) {
       return `🌱 ${query}? Best suited for ${details.soil_type}.
-💡 Fertilizer tip: ${details.fertilizers}`;
+      💡 Fertilizer tip: ${details.fertilizers}`;
     }
   }
 
@@ -45,8 +45,8 @@ ${mentionedCrop ? `✅ Yes, "${mentionedCrop}" grows well here.` : ""}`;
       if (soilKeyFromAI) {
         const soil = soilData[soilKeyFromAI];
         return `🤖 Based on AI analysis, your area seems to have ${soil.soil_type}.
-🌱 Crops: ${soil.crops.join(", ")}.
-💡 Fertilizer tip: ${soil.fertilizers}`;
+        🌱 Crops: ${soil.crops.join(", ")}.
+        💡 Fertilizer tip: ${soil.fertilizers}`;
       }
     }
   } catch (err) {
