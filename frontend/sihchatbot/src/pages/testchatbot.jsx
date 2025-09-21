@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Mic, Send, Leaf, Info, Eye, MoreHorizontal } from "lucide-react";
+import { Mic, Send } from "lucide-react";
 
 export default function Chatbot() {
   const [messages, setMessages] = useState([]);
@@ -8,37 +8,9 @@ export default function Chatbot() {
   const [voices, setVoices] = useState([]);
   const [selectedLang, setSelectedLang] = useState("en-US");
 
-  const BACKEND_URL = "https://multilingual-ai-chatbot.onrender.com/"; // default
+  const BACKEND_URL = " https://multilingual-ai-chatbot.onrender.com/api/chat"; 
+  // ⬆ replace with your actual backend endpoint
 
-  // 🔹 Dynamic quick action buttons with different endpoints
-  const quickActions = [
-    {
-      label: "Farming Tips",
-      icon: <Leaf size={18} />,
-      message: "Give me a farming tip",
-      url: "https://multilingual-ai-chatbot.onrender.com/api/chat",
-    },
-    {
-      label: "Weather Summary",
-      icon: <Info size={18} />,
-      message: "Give me today’s weather summary",
-      url: "https://multilingual-ai-chatbot.onrender.com/weather/advisory",
-    },
-    {
-      label: "Mandiprices",
-      icon: <Eye size={18} />,
-      message: "Analyze crop prices",
-      url: "https://multilingual-ai-chatbot.onrender.com/price/advisory",
-    },
-    {
-      label: "More",
-      icon: <MoreHorizontal size={18} />,
-      message: "Show me more options",
-      url: "https://multilingual-ai-chatbot.onrender.com/api/chat",
-    },
-  ];
-
-  // Load available voices
   useEffect(() => {
     const loadVoices = () => {
       setVoices(speechSynthesis.getVoices());
@@ -47,31 +19,31 @@ export default function Chatbot() {
     window.speechSynthesis.onvoiceschanged = loadVoices;
   }, []);
 
-  // Send message to backend
-  const sendMessage = async (customMessage, url = BACKEND_URL) => {
-    const userMessage = customMessage || input;
-    if (!userMessage.trim()) return;
+  // Send message
+  const sendMessage = async () => {
+    if (!input.trim()) return;
 
-    setMessages((prev) => [...prev, { text: userMessage, sender: "user" }]);
+    // Add user message to chat
+    setMessages((prev) => [...prev, { text: input, sender: "user" }]);
+    const userMessage = input;
     setInput("");
 
     try {
-      const res = await fetch(url, {
+      // Call backend API
+      const res = await fetch(BACKEND_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({ message: userMessage }), // adjust key if backend expects different
       });
 
       const data = await res.json();
-      console.log("Backend response:", data);
+      console.log("Backend response:",data)
+      const reply = data.response || "Sorry, I didn’t understand that."; 
 
-      const reply =
-        data.reply ||
-        data.message ||
-        data.response ||
-        "Sorry, I didn’t understand that.";
-
+      // Add bot reply
       setMessages((prev) => [...prev, { text: reply, sender: "bot" }]);
+
+      // Speak reply
       speakMessage(reply, selectedLang);
     } catch (error) {
       console.error("Error talking to backend:", error);
@@ -80,7 +52,6 @@ export default function Chatbot() {
     }
   };
 
-  // Handle Enter key
   const handleKeyDown = (e) => {
     if (e.key === "Enter") sendMessage();
   };
@@ -122,28 +93,11 @@ export default function Chatbot() {
 
   return (
     <div className="flex flex-col h-[85vh] w-full max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden">
-      {/* Header */}
+      
       <div className="p-3 sm:p-4 bg-green-600 text-white font-bold text-lg sm:text-xl text-center">
         Farming Assistant Chatbot 🌾
       </div>
 
-      {/* Quick Action Buttons */}
-      <div className="flex flex-wrap gap-2 p-3 sm:p-4 justify-center">
-        {quickActions.map((action, index) => (
-          <button
-            key={index}
-            onClick={() => sendMessage(action.message, action.url)}
-            className="flex items-center gap-1 px-3 py-2 rounded-full bg-gray-200 dark:bg-gray-700 
-                       text-sm text-gray-900 dark:text-gray-100 hover:bg-green-500 hover:text-white 
-                       transition"
-          >
-            {action.icon}
-            {action.label}
-          </button>
-        ))}
-      </div>
-
-      
       <div className="flex-1 p-3 sm:p-4 space-y-3 overflow-y-auto">
         {messages.map((msg, i) => (
           <div
@@ -159,7 +113,6 @@ export default function Chatbot() {
         ))}
       </div>
 
-      {/* Input Section */}
       <div className="p-2 sm:p-3 border-t border-gray-300 dark:border-gray-700 flex flex-col sm:flex-row items-center gap-2">
         <select
           className="w-full sm:w-auto p-2 rounded-lg border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
@@ -175,7 +128,6 @@ export default function Chatbot() {
         </select>
 
         <div className="flex items-center gap-2 w-full">
-          {/* Mic */}
           <button
             onClick={startListening}
             className={`p-2 rounded-full ${
@@ -188,21 +140,19 @@ export default function Chatbot() {
             <Mic size={20} />
           </button>
 
-          {/* Text Input */}
           <input
             type="text"
+            className="flex-1 p-2 rounded-lg border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your question..."
-            className="flex-1 p-2 rounded-lg border border-gray-400 dark:border-gray-600 bg-white 
-                       dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            placeholder="Ask me about farming..."
           />
 
-          {/* Send Button */}
           <button
-            onClick={() => sendMessage()}
-            className="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition"
+            onClick={sendMessage}
+            className="p-2 bg-green-500 text-white rounded-full"
+            title="Send"
           >
             <Send size={20} />
           </button>

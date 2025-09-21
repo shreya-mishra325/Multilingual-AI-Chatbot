@@ -8,33 +8,41 @@ export default function Chatbot() {
   const [voices, setVoices] = useState([]);
   const [selectedLang, setSelectedLang] = useState("en-US");
 
-  const BACKEND_URL = "https://multilingual-ai-chatbot.onrender.com/"; // default
+  const BACKEND_URL = "https://your-backend-url.com/api/chat"; // 👈 replace with your backend
 
-  // 🔹 Dynamic quick action buttons with different endpoints
+  // 🔹 Dynamic quick action buttons with endpoint + type
   const quickActions = [
     {
       label: "Farming Tips",
       icon: <Leaf size={18} />,
       message: "Give me a farming tip",
       url: "https://multilingual-ai-chatbot.onrender.com/api/chat",
+      method: "POST",
+      type: "message", // expects { message }
     },
     {
       label: "Weather Summary",
       icon: <Info size={18} />,
       message: "Give me today’s weather summary",
       url: "https://multilingual-ai-chatbot.onrender.com/weather/advisory",
+      method: "POST",
+      type: "message", // expects { message }
     },
     {
-      label: "Mandiprices",
+      label: "Mandi Prices",
       icon: <Eye size={18} />,
-      message: "Analyze crop prices",
+      message: "Tell me about price of bottlegourd",
       url: "https://multilingual-ai-chatbot.onrender.com/price/advisory",
+      method: "POST",
+      type: "query", // expects { query, language }
     },
     {
       label: "More",
       icon: <MoreHorizontal size={18} />,
       message: "Show me more options",
       url: "https://multilingual-ai-chatbot.onrender.com/api/chat",
+      method: "POST",
+      type: "message",
     },
   ];
 
@@ -47,19 +55,35 @@ export default function Chatbot() {
     window.speechSynthesis.onvoiceschanged = loadVoices;
   }, []);
 
-  // Send message to backend
-  const sendMessage = async (customMessage, url = BACKEND_URL) => {
+  // 🔹 Send message to backend
+  const sendMessage = async (
+    customMessage,
+    url = BACKEND_URL,
+    method = "POST",
+    type = "message"
+  ) => {
     const userMessage = customMessage || input;
     if (!userMessage.trim()) return;
 
+    // Add user message to chat
     setMessages((prev) => [...prev, { text: userMessage, sender: "user" }]);
     setInput("");
 
     try {
+      let body = {};
+
+      if (type === "query") {
+        // ✅ For mandi prices API
+        body = { query: userMessage, language: "en" };
+      } else {
+        // ✅ Default APIs
+        body = { message: userMessage };
+      }
+
       const res = await fetch(url, {
-        method: "POST",
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
@@ -75,8 +99,10 @@ export default function Chatbot() {
       speakMessage(reply, selectedLang);
     } catch (error) {
       console.error("Error talking to backend:", error);
-      const failMsg = "⚠ Unable to reach server. Please try again.";
-      setMessages((prev) => [...prev, { text: failMsg, sender: "bot" }]);
+      setMessages((prev) => [
+        ...prev,
+        { text: "⚠ Unable to reach server. Please try again.", sender: "bot" },
+      ]);
     }
   };
 
@@ -132,7 +158,9 @@ export default function Chatbot() {
         {quickActions.map((action, index) => (
           <button
             key={index}
-            onClick={() => sendMessage(action.message, action.url)}
+            onClick={() =>
+              sendMessage(action.message, action.url, action.method, action.type)
+            }
             className="flex items-center gap-1 px-3 py-2 rounded-full bg-gray-200 dark:bg-gray-700 
                        text-sm text-gray-900 dark:text-gray-100 hover:bg-green-500 hover:text-white 
                        transition"
@@ -143,7 +171,7 @@ export default function Chatbot() {
         ))}
       </div>
 
-      
+      {/* Messages */}
       <div className="flex-1 p-3 sm:p-4 space-y-3 overflow-y-auto">
         {messages.map((msg, i) => (
           <div
