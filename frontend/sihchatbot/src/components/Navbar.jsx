@@ -21,7 +21,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link
             to="/"
-            className="text-2xl font-bold text-green-600 dark:text-green-400"
+            className="text-2xl font-bold text-[#4f7942] dark:text-[#4f7942]"
           >
             AgriTech 🌱
           </Link>

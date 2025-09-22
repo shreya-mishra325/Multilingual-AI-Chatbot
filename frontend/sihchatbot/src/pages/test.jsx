@@ -191,7 +191,7 @@ export default function Chatbot() {
             key={i}
             className={`p-2 sm:p-3 rounded-xl max-w-[85%] sm:max-w-xs break-words ${
               msg.sender === "user"
-                ? "bg-green-500 dark:bg-[#4f7942] text-white self-end ml-auto"
+                ? "bg-[#4f7942] dark:bg-[#4f7942] text-white self-end ml-auto"
                 : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 self-start"
             }`}
           >
@@ -258,7 +258,7 @@ export default function Chatbot() {
           {/* Send Button */}
           <button
             onClick={() => sendMessage()}
-            className="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition"
+            className="p-2 bg-[#4f7942] text-white rounded-full hover:bg-green-600 transition"
           >
             <Send size={20} />
           </button>
