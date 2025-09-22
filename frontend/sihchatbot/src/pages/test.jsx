@@ -31,7 +31,7 @@ export default function Chatbot() {
     {
       label: "Mandi Prices",
       icon: <Eye size={18} />,
-      message: "Tell me about price of bottlegourd",
+      message: "Tell me about price of bottlegourd ",
       url: "https://multilingual-ai-chatbot.onrender.com/price/advisory",
       method: "POST",
       type: "query",
@@ -158,9 +158,9 @@ export default function Chatbot() {
   };
 
   return (
-    <div className="m-6 flex flex-col h-[85vh] w-full max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden">
+    <div className="mx-2.5 my-6 sm:mx-auto flex flex-col h-[85vh] w-[95%] sm:w-full max-w-4xl bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden">
       {/* Header */}
-      <div className="p-3 sm:p-4 bg-green-600 text-white font-bold text-lg sm:text-xl text-center">
+      <div className="p-3 sm:p-4 bg-[#4f7942] text-white font-bold text-lg sm:text-xl text-center">
         Farming Assistant Chatbot 🌾
       </div>
 
@@ -174,7 +174,7 @@ export default function Chatbot() {
       className={`flex items-center gap-1 px-3 py-2 rounded-full text-sm transition
         ${
           currentAction?.label === action.label
-            ? "bg-green-500 text-white"
+            ? "bg-[#4f7942] text-white"
             : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-green-500 hover:text-white"
         }`}
     >
@@ -191,7 +191,7 @@ export default function Chatbot() {
             key={i}
             className={`p-2 sm:p-3 rounded-xl max-w-[85%] sm:max-w-xs break-words ${
               msg.sender === "user"
-                ? "bg-green-500 text-white self-end ml-auto"
+                ? "bg-green-500 dark:bg-[#4f7942] text-white self-end ml-auto"
                 : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 self-start"
             }`}
           >
@@ -201,7 +201,7 @@ export default function Chatbot() {
       </div>
 
       {/* Input Section */}
-      <div className="p-2 sm:p-3 border-t border-gray-300 dark:border-gray-700 flex flex-col sm:flex-row items-center gap-2">
+      <div className="p-2 sm:p-3 border-t border-gray-300 dark:border-gray-700 flex flex-col sm:flex-row items-center gap-2 w-full">
         <select
           className="w-full sm:w-auto p-2 rounded-lg border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
           value={selectedLang}
@@ -252,7 +252,7 @@ export default function Chatbot() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your question..."
-            className="flex-1 p-2 rounded-lg border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            className="flex-1 min-w-0 p-2 rounded-lg border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
           />
 
           {/* Send Button */}
