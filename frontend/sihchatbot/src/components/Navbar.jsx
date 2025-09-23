@@ -23,7 +23,7 @@ export default function Navbar() {
             to="/"
             className="text-2xl font-bold text-[#4f7942] dark:text-[#4f7942]"
           >
-            KhetibadiMitra 🌱
+            KhetibadiMitra🌱
           </Link>
 
           {/* Desktop Menu */}
