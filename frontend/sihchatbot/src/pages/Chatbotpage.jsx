@@ -25,7 +25,7 @@ export default function Chatbot() {
       url: "https://multilingual-ai-chatbot.onrender.com/weather/advisory",
     },
     {
-      label: "Mandiprices",
+      label: "Mandi Prices",
       icon: <Eye size={18} />,
       message: "Analyze crop prices",
       url: "https://multilingual-ai-chatbot.onrender.com/price/advisory",
@@ -137,13 +137,12 @@ export default function Chatbot() {
                        text-sm text-gray-900 dark:text-gray-100 hover:bg-green-500 hover:text-white 
                        transition"
           >
-            {action.icon}
-            {action.label}
+            {action.icon} {action.label}
           </button>
         ))}
       </div>
 
-      
+      {/* Messages */}
       <div className="flex-1 p-3 sm:p-4 space-y-3 overflow-y-auto">
         {messages.map((msg, i) => (
           <div
@@ -153,6 +152,7 @@ export default function Chatbot() {
                 ? "bg-green-500 text-white self-end ml-auto"
                 : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 self-start"
             }`}
+            style={{ whiteSpace: "pre-wrap" }}
           >
             {msg.text}
           </div>
