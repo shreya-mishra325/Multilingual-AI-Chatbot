@@ -144,17 +144,28 @@ export default function Chatbot() {
 
       {/* Messages */}
       <div className="flex-1 p-3 sm:p-4 space-y-3 overflow-y-auto">
-      {messages.map((msg, i) => (
+      {messages.map((msg, i) =>
+  msg.sender === "bot" && msg.text.includes("📍") ? (
+    msg.text.split("\n\n").map((entry, idx) => (
       <div
-        key={i}
-        className={`p-2 sm:p-3 rounded-xl max-w-[85%] sm:max-w-xs break-words whitespace-pre-line ${
-          msg.sender === "user"
-            ? "bg-green-500 text-white self-end ml-auto"
-            : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 self-start"
-        }`}
+        key={i + "-" + idx}
+        className="p-2 sm:p-3 rounded-xl max-w-[85%] sm:max-w-xs bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 self-start break-words whitespace-pre-line mb-2"
       >
-        {msg.text}
+        {entry}
       </div>
+    ))
+  ) : (
+    <div
+      key={i}
+      className={`p-2 sm:p-3 rounded-xl max-w-[85%] sm:max-w-xs break-words ${
+        msg.sender === "user"
+          ? "bg-green-500 text-white self-end ml-auto"
+          : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 self-start"
+      }`}
+      style={{ whiteSpace: "pre-line" }}
+    >
+      {msg.text}
+    </div>
     ))}
     </div>
 
