@@ -144,20 +144,20 @@ export default function Chatbot() {
 
       {/* Messages */}
       <div className="flex-1 p-3 sm:p-4 space-y-3 overflow-y-auto">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`p-2 sm:p-3 rounded-xl max-w-[85%] sm:max-w-xs break-words ${
-              msg.sender === "user"
-                ? "bg-green-500 text-white self-end ml-auto"
-                : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 self-start"
-            }`}
-            style={{ whiteSpace: "pre-wrap" }}
-          >
-            {msg.text}
-          </div>
-        ))}
+      {messages.map((msg, i) => (
+      <div
+        key={i}
+        className={`p-2 sm:p-3 rounded-xl max-w-[85%] sm:max-w-xs break-words whitespace-pre-line ${
+          msg.sender === "user"
+            ? "bg-green-500 text-white self-end ml-auto"
+            : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 self-start"
+        }`}
+      >
+        {msg.text}
       </div>
+    ))}
+    </div>
+
 
       {/* Input Section */}
       <div className="p-2 sm:p-3 border-t border-gray-300 dark:border-gray-700 flex flex-col sm:flex-row items-center gap-2">
