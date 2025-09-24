@@ -70,9 +70,9 @@ export async function getPriceAdvisory(commodity, state, district) {
     `📍 ${r.District}, ${r.State} - ${r.Market}\n` +
     `🌾 ${r.Commodity}\n` +
     `• Arrival Date: ${r.Arrival_Date}\n` +
-    `• Minimum: ₹${r.Min} per quintal\n` +
-    `• Maximum: ₹${r.Max} per quintal\n` +
-    `• Modal: ₹${r.Modal} per quintal`
+    `• Minimum: ₹${r.MinPrice} per quintal\n` +
+    `• Maximum: ₹${r.MaxPrice} per quintal\n` +
+    `• Modal: ₹${r.ModalPrice} per quintal\n`
   )
   .join("\n\n"); 
   } catch (error) {
