@@ -66,15 +66,23 @@ export async function getPriceAdvisory(commodity, state, district) {
     }
 
     return matches
-    .map(r =>
-    `📍 ${r.District}, ${r.State} - ${r.Market}\n` +
-    `🌾 ${r.Commodity}\n` +
-    `• Arrival Date: ${r.Arrival_Date}\n` +
-    `• Minimum: ₹${r.MinPrice} per quintal\n` +
-    `• Maximum: ₹${r.MaxPrice} per quintal\n` +
-    `• Modal: ₹${r.ModalPrice} per quintal\n`
-  )
-  .join("\n\n"); 
+  .map((r) => {
+    const min = r.MinPrice ?? "N/A";
+    const max = r.MaxPrice ?? "N/A";
+    const modal = r.ModalPrice ?? "N/A";
+    const arrival = r.Arrival_Date ?? "N/A";
+
+    return (
+      `📍 ${r.District}, ${r.State} - ${r.Market}\n` +
+      `🌾 ${r.Commodity}\n` +
+      `• Arrival Date: ${arrival}\n` +
+      `• Minimum: ₹${min} per quintal\n` +
+      `• Maximum: ₹${max} per quintal\n` +
+      `• Modal: ₹${modal} per quintal\n`
+    );
+  })
+  .join("\n\n");
+
   } catch (error) {
     console.error("Error in getPriceAdvisory:", error.message);
     return "❌ Sorry, I faced an issue while fetching price data. Please try again later.";
