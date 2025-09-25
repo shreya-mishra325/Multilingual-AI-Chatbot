@@ -27,7 +27,7 @@ export default function Chatbot() {
     },
     {
       label: "💧 Weather",
-      text: "give me today's weather summary",
+      text: "weather alert for delhi",
       url: "https://multilingual-ai-chatbot.onrender.com/weather/advisory",
       type: "message",
     },

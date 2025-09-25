@@ -21,7 +21,7 @@ export default function Chatbot() {
     {
       label: "Weather Summary",
       icon: <Info size={18} />,
-      message: "weather alert for delhi",
+      message: "Give me today’s weather summary",
       url: "https://multilingual-ai-chatbot.onrender.com/weather/advisory",
     },
     {
