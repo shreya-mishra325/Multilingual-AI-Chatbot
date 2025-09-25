@@ -23,7 +23,7 @@ export default function Chatbot() {
     {
       label: "Weather Summary",
       icon: <Info size={18} />,
-      message: "Give me today’s weather summary",
+      message: "Give me today’s weather summary in Delhi",
       url: "https://multilingual-ai-chatbot.onrender.com/weather/advisory",
       method: "POST",
       type: "message",
@@ -31,7 +31,7 @@ export default function Chatbot() {
     {
       label: "Mandi Prices",
       icon: <Eye size={18} />,
-      message: "Tell me about price of bottlegourd ",
+      message: "price of bottlegourd in Lucknow",
       url: "https://multilingual-ai-chatbot.onrender.com/price/advisory",
       method: "POST",
       type: "query",
