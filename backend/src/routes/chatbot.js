@@ -10,147 +10,251 @@ import { detectIntent } from "../services/dialogFlowService.js";
 const router = express.Router();
 
 let chatHistory = [];
-let userContext = {}; 
+let userContext = {};
 
-const COMMON_CROPS = ["wheat", "maize", "rice", "tomato", "potato"];
-const COMMON_STATES = ["Punjab", "Haryana", "Bihar", "Maharashtra"];
-const COMMON_DISTRICTS = ["Ludhiana", "Mohali", "Ropar", "Patiala"];
+const HINDI_MAP = {
+  tamatar: "tomato",
+  gehun: "wheat",
+  chawal: "rice",
+  aloo: "potato",
+  pyaaz: "onion"
+};
+
+const extractCrop = (msg) => {
+  const crops = [
+    "green chilli", "chilli", "chili",
+    "wheat", "rice", "maize", "tomato", "potato",
+    "onion", "soybean", "cotton", "barley", "mustard"
+  ];
+  crops.sort((a, b) => b.length - a.length);
+  return crops.find(crop => msg.includes(crop)) || null;
+};
+
+const normalizeCrop = (crop) => {
+  if (!crop) return null;
+  if (crop.includes("chilli") || crop.includes("chili")) return "green chilli";
+  return crop;
+};
+
+const mapHindiToEnglish = (msg) => {
+  for (let key in HINDI_MAP) {
+    if (msg.includes(key)) return HINDI_MAP[key];
+  }
+  return null;
+};
+
+const extractDistrict = (msg) => {
+  if (!msg) return null;
+
+  const patterns = [
+    /in\s+([a-z\s]+)/,
+    /for\s+([a-z\s]+)/,
+    /at\s+([a-z\s]+)/,
+    /weather\s+([a-z\s]+)/,
+    /([a-z\s]+)\s+weather/
+  ];
+
+  for (let pattern of patterns) {
+    const match = msg.match(pattern);
+    if (match) return match[1].trim();
+  }
+
+  const words = msg.split(" ");
+  const ignore = [
+    "weather", "price", "soil", "pest",
+    "alert", "today", "tomorrow", "what", "is"
+  ];
+
+  const possible = words.filter(w => !ignore.includes(w));
+  return possible.length ? possible.join(" ") : null;
+};
+
+const cleanValue = (val) => {
+  if (!val) return null;
+  if (Array.isArray(val)) return val[0];
+  return val;
+};
+
+const cleanMarkdown = (text) => {
+  if (!text) return text;
+  return text
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*/g, "•");
+};
 
 router.post("/chat", async (req, res) => {
-  const {message, village, state, district, language, userId} = req.body;
-
-  if (!message || !message.trim())
-  return res.status(400).json({ error: "Message is required" });
-  if (!userContext[userId]) userContext[userId] = {
-    village: null,
-    state: null,
-    district: null,
-    crops: [],
-    keyFacts: [] 
-  };
-
-  const userCtx = userContext[userId];
-
-  if (village) userCtx.village = village;
-  if (state) userCtx.state = state;
-  if (district) userCtx.district = district;
-
-  let messageInEnglish = message;
-  if (language && language !== "en") {
-    try { messageInEnglish = await translateText(message, "en"); }
-    catch { messageInEnglish = message; }
-  }
-
-  let nlpOutput = {intent: "unknown", entities: {}};
   try {
-    const dfResponse = await detectIntent(messageInEnglish);
-    nlpOutput.intent = dfResponse.intent || "unknown";
-    nlpOutput.entities = dfResponse.entities || {};
-  } catch {
-    try { nlpOutput = await getAIResponse(messageInEnglish, userCtx, { mode: "intent"}); }
-    catch { nlpOutput.intent = "unknown"; nlpOutput.entities = {}; }
-  }
+    const { message, village, state, district, language, userId } = req.body;
 
-  const entities = nlpOutput.entities || {};
-  const crop = entities.commodity || entities.crop || null;
-  if (crop && !userCtx.crops.includes(crop)) userCtx.crops.push(crop);
-
-  let finalResponse = "";
-  let backendJSON = { action: nlpOutput.intent, data: {} };
-
-  const farmingIntents = ["get_weather_alert","get_crop_price","get_soil_health","get_pest_info"];
-
-  if (farmingIntents.includes(nlpOutput.intent)) {
-    switch (nlpOutput.intent) {
-      case "get_weather_alert": {
-        const location = entities.city || entities.district || village || userCtx.village || "unknown";
-        if (location === "unknown") finalResponse = "❌ Please provide your village or city name.";
-        else {
-          const advisory = await getWeatherAdvisory(location);
-          finalResponse = language !== "en" ? await translateText(advisory, language) : advisory;
-        }
-        break;
-      }
-      case "get_crop_price": {
-        const queryCrop = crop || userCtx.crops[userCtx.crops.length - 1];
-        if (!queryCrop) finalResponse = "❌ Please tell me which crop’s price you want.";
-        else {
-          const advisory = await getPriceAdvisory(queryCrop, state, district);
-          finalResponse = language !== "en" ? await translateText(advisory, language) : advisory;
-        }
-        break;
-      }
-      case "get_soil_health": {
-        const query = crop || entities.soilType || userCtx.village || "unknown";
-        if (query === "unknown") finalResponse = "❌ Please provide soil type, crop, or village.";
-        else {
-          const advisory = await getSoilAdvisory(query);
-          finalResponse = language !== "en" ? await translateText(advisory, language) : advisory;
-        }
-        break;
-      }
-      case "get_pest_info": {
-        const queryCrop = crop || userCtx.crops[userCtx.crops.length - 1];
-        if (!queryCrop) finalResponse = "❌ Please tell me the crop name.";
-        else {
-          const advisory = await getPestAdvice(queryCrop);
-          finalResponse = language !== "en" ? await translateText(advisory, language) : advisory;
-        }
-        break;
-      }
+    if (!message || !message.trim()) {
+      return res.status(400).json({ error: "Message is required" });
     }
 
-    if (crop) userCtx.keyFacts.push(`User grows ${crop}`);
-  } else {
-    const greetingMatch = messageInEnglish.match(/\b(hi|hello|hey|how are you)\b/i);
-    if (greetingMatch) {
-      finalResponse = "Hello! I’m your farming assistant. How can I help?";
-      backendJSON.action = "small_talk";
-    } else {
+    const uid = userId || "default_user";
+
+    if (!userContext[uid]) {
+      userContext[uid] = {
+        village: null,
+        state: null,
+        district: null,
+        crops: [],
+        keyFacts: [],
+        lastIntent: null,
+        lastCrop: null,
+        lastLocation: null
+      };
+    }
+
+    const ctx = userContext[uid];
+
+    if (village) ctx.village = village;
+    if (state) ctx.state = state;
+    if (district) ctx.district = district;
+
+    let messageInEnglish = message;
+
+    if (language && language !== "en") {
       try {
-        const contextPrompt =
-        `You are a helpful farming assistant.
-        Keep your answer short (max 3 sentences).
-        Key user context:
-        - Village: ${userCtx.village || "unknown"}
-        - State/District: ${userCtx.state || ""}/${userCtx.district || ""}
-        - Crops: ${userCtx.crops.join(", ") || "none"}
-        - Important facts: ${userCtx.keyFacts.slice(-5).join("; ") || "none"}
-
-        Answer the user message concisely: "${messageInEnglish}"`;
-
-        const aiResponse = await getAIResponse(contextPrompt, userCtx, {mode: "text"});
-        finalResponse = language !== "en" ? await translateText(aiResponse, language) : aiResponse;
-        backendJSON.action = "gemini_context_aware";
-        const commodityMatch = finalResponse.match(new RegExp(COMMON_CROPS.join("|"), "i"));
-        const stateMatch = finalResponse.match(new RegExp(COMMON_STATES.join("|"), "i"));
-        const districtMatch = finalResponse.match(new RegExp(COMMON_DISTRICTS.join("|"), "i"));
-
-        backendJSON.data = {
-          commodity: commodityMatch ? [commodityMatch[0]] : [],
-          state: stateMatch ? [stateMatch[0]] : [],
-          district: districtMatch ? [districtMatch[0]] : []
-        };
-      } catch (err) {
-        console.error("Gemini error:", err.message);
-        finalResponse = "❌ Sorry, I couldn’t process your query at the moment.";
-        backendJSON.action = "fallback_error";
-      }
+        messageInEnglish = await translateText(message, "en");
+      } catch {}
     }
+
+    const msg = messageInEnglish.toLowerCase();
+
+    let intent = "unknown";
+    let entities = {};
+
+    try {
+      const df = await detectIntent(messageInEnglish);
+      intent = df.intent || "unknown";
+      entities = df.entities || {};
+      if (df.confidence && df.confidence < 0.6) intent = "unknown";
+    } catch {}
+
+    if (
+      msg.includes("price") ||
+      msg.includes("mandi") ||
+      msg.includes("rate") ||
+      msg.includes("bhav") ||
+      msg.includes("cost")
+    ) intent = "get_crop_price";
+
+    if (msg.includes("weather")) intent = "get_weather_alert";
+    if (msg.includes("soil")) intent = "get_soil_health";
+    if (msg.includes("pest") || msg.includes("disease")) intent = "get_pest_info";
+
+    const detectedCrop = extractCrop(msg) || mapHindiToEnglish(msg);
+    const detectedDistrict = extractDistrict(msg);
+
+    let finalCrop =
+      detectedCrop ||
+      mapHindiToEnglish(msg) ||
+      cleanValue(entities.crop) ||
+      cleanValue(entities.commodity) ||
+      ctx.lastCrop;
+
+    finalCrop = normalizeCrop(finalCrop);
+
+    let finalLocation =
+      detectedDistrict ||
+      cleanValue(entities.district) ||
+      cleanValue(entities.city) ||
+      ctx.lastLocation ||
+      ctx.village;
+
+    if (intent === "unknown" && ctx.lastIntent) {
+      intent = ctx.lastIntent;
+    }
+
+    if (finalCrop && !ctx.crops.includes(finalCrop)) {
+      ctx.crops.push(finalCrop);
+    }
+
+    ctx.lastIntent = intent;
+    ctx.lastCrop = finalCrop;
+    ctx.lastLocation = finalLocation;
+
+    let finalResponse = "";
+
+    switch (intent) {
+      case "get_crop_price":
+        if (!finalCrop) {
+          finalResponse = "❌ Please tell me the crop name.";
+        } else {
+          finalResponse = await getPriceAdvisory(finalCrop, state, finalLocation);
+        }
+        break;
+
+      case "get_weather_alert":
+        if (!finalLocation) {
+          finalResponse = "❌ Please tell me your city or village.";
+        } else {
+          finalResponse = await getWeatherAdvisory(finalLocation);
+        }
+        break;
+
+      case "get_soil_health":
+        finalResponse = await getSoilAdvisory(finalCrop || finalLocation);
+        break;
+
+      case "get_pest_info":
+        if (!finalCrop) {
+          finalResponse = "❌ Please tell me the crop name.";
+        } else {
+          finalResponse = await getPestAdvice(finalCrop);
+        }
+        break;
+
+      default:
+        try {
+          const prompt = `
+You are a helpful farming assistant.
+Keep answers short and practical.
+
+Village: ${ctx.village || "unknown"}
+State/District: ${ctx.state || ""}/${ctx.district || ""}
+Crops: ${ctx.crops.join(", ") || "none"}
+
+User: ${messageInEnglish}
+`;
+          finalResponse = await getAIResponse(prompt);
+        } catch {
+          finalResponse = "⚠️ I’m having trouble right now. Please try again.";
+        }
+    }
+
+    finalResponse = cleanMarkdown(finalResponse);
+
+    if (
+      language &&
+      language !== "en" &&
+      typeof finalResponse === "string" &&
+      finalResponse.length < 500 &&
+      !finalResponse.startsWith("❌")
+    ) {
+      try {
+        finalResponse = await translateText(finalResponse, language);
+      } catch {}
+    }
+
+    chatHistory.push({ userId: uid, user: message, bot: finalResponse });
+
+    ctx.keyFacts.push(`User asked: ${message}`);
+    if (ctx.keyFacts.length > 10) ctx.keyFacts.shift();
+
+    res.json({ response: finalResponse });
+
+  } catch (err) {
+    res.json({ response: "⚠️ Something went wrong. Please try again." });
   }
-
-  chatHistory.push({userId, user: message, bot: finalResponse});
-  userCtx.keyFacts.push(`User asked: ${message}`);
-  if (userCtx.keyFacts.length > 10) userCtx.keyFacts.shift();
-
-  res.json({ response: finalResponse, json: backendJSON });
 });
 
 router.get("/history", (req, res) => res.json(chatHistory));
+
 router.delete("/history", (req, res) => {
   chatHistory = [];
   userContext = {};
-  res.json({ message: "Chat history and user context cleared successfully." });
+  res.json({ message: "History cleared" });
 });
 
 export default router;

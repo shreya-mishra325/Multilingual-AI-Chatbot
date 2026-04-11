@@ -1,48 +1,54 @@
-import axios from "axios";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+export async function getAIResponse(prompt, context = {}) {
+  try {
+    const model = genAI.getGenerativeModel({
+      model: "gemini-flash-latest"
+    });
 
-export async function getAIResponse(userMessage, context = {}, options = { mode: "text" }) {
-try {
-    let systemInstruction =
-      options.mode === "intent" ? `Extract the farmer's intent and entities from the message. Return JSON only in this format:
-{
-  "intent": "get_weather_alert" | "get_crop_price" | "get_pest_info" | "get_soil_health" | "unknown",
-  "entities": { "city"?: string, "crop"?: string, "village"?: string }
-}`
-: "You are a helpful assistant answering farmers' queries.";
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
 
-const payload = {
-    contents: [
-      {
-        role: "user",
-        parts: [{ text: `${systemInstruction}\n\nUser: ${userMessage}` }]
-      }
-    ]
-  };
+    console.log("✅ Gemini success (primary)");
+    return text;
 
-const response = await axios.post(GEMINI_API_URL, payload, {
-    headers: { "Content-Type": "application/json" }
-  });
-
-const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-  if (options.mode === "intent") {
+  } catch (error) {
+    console.error("🔥 Gemini Error (primary):", error.message);
     try {
-      return JSON.parse(text);
-    } catch {
-      return { intent: "unknown", entities: {} };
+      await delay(1000);
+
+      const retryModel = genAI.getGenerativeModel({
+        model: "gemini-flash-latest"
+      });
+
+      const retryResult = await retryModel.generateContent(prompt);
+      const retryText = retryResult.response.text();
+
+      console.log("🔁 Gemini success (retry)");
+      return retryText;
+
+    } catch (retryError) {
+      console.error("🔥 Gemini Retry Failed:", retryError.message);
+      try {
+        const fallbackModel = genAI.getGenerativeModel({
+          model: "gemini-flash-lite-latest"
+        });
+
+        const fallbackResult = await fallbackModel.generateContent(prompt);
+        const fallbackText = fallbackResult.response.text();
+
+        console.log("🔄 Gemini success (fallback)");
+        return fallbackText;
+
+      } catch (fallbackError) {
+        console.error("🔥 Gemini Fallback Failed:", fallbackError.message);
+        return "⚠️ AI is currently busy. Please try again in a few seconds.";
+      }
     }
   }
-  return text || "Sorry, I could not understand your question.";
-} catch (error) {
-  console.error("Error in GeminiService:", error.response?.data || error.message);
-  return options.mode === "intent"
-    ? { intent: "unknown", entities: {} }
-    : "Sorry, I am having trouble answering right now.";
-}
 }

@@ -7,13 +7,13 @@
     "start": "node src/server.js"
   },
   "dependencies": {
-    "@google-cloud/dialogflow": "^7.2.0",
-    "@google-cloud/translate": "^9.2.0",
+    "@google-cloud/dialogflow": "^6.14.0",
+    "@google-cloud/translate": "^9.3.0",
     "@google/generative-ai": "^0.24.1",
     "@vitalets/google-translate-api": "^9.2.1",
     "axios": "^1.12.1",
     "body-parser": "^2.2.0",
-    "cors": "^2.8.5",
+    "cors": "^2.8.6",
     "csv-parser": "^3.2.0",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",

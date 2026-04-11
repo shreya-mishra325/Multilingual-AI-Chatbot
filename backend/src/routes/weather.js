@@ -46,10 +46,10 @@ try {
     console.log("Weather advisory not found, using AI fallback.");
 
     const aiPrompt = `You are a helpful farming assistant.
-Provide a short, direct weather advisory for farmers.
-Use emojis to indicate conditions: 🌤️ clear, ☔ rain, 🌪️ storm, ⚠️ alert.
-Keep it 1-2 sentences.
-Location: ${location}`;
+    Provide a short, direct weather advisory for farmers.
+    Use emojis to indicate conditions: 🌤️ clear, ☔ rain, 🌪️ storm, ⚠️ alert.
+    Keep it 1-2 sentences.
+    Location: ${location}`;
     advisory = await getAIResponse(aiPrompt);
   }
 
@@ -68,10 +68,10 @@ Location: ${location}`;
 
   try {
     const aiPrompt = `You are a helpful farming assistant.
-Provide a short, direct weather advisory for farmers.
-Use emojis to indicate conditions: 🌤️ clear, ☔ rain, 🌪️ storm, ⚠️ alert.
-Keep it 1-2 sentences.
-Location: ${location || query}`;
+    Provide a short, direct weather advisory for farmers.
+    Use emojis to indicate conditions: 🌤️ clear, ☔ rain, 🌪️ storm, ⚠️ alert.
+    Keep it 2-3 sentences.
+    Location: ${location || query}`;
 
   let aiReply = await getAIResponse(aiPrompt);
 

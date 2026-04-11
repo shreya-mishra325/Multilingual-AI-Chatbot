@@ -18,44 +18,85 @@ function loadCSV() {
       .on("error", reject);
   });
 }
+
 await loadCSV();
 
-export async function getPriceAdvisory(commodity, state, district) {
+const STATES = [
+  "uttar pradesh",
+  "punjab",
+  "haryana",
+  "bihar",
+  "maharashtra",
+  "odisha"
+];
+
+function normalizeLocation(district, state) {
+  if (!district) return { district: null, state };
+  const lower = district.toLowerCase();
+  if (STATES.includes(lower)) {
+    return { district: null, state: lower };
+  }
+  return { district, state };
+}
+
+function clean(val) {
+  if (!val) return null;
+  if (Array.isArray(val)) return val[0];
+  return String(val).trim();
+}
+
+function normalizeCrop(crop) {
+  if (!crop) return null;
+  const c = crop.toLowerCase();
+  if (c.includes("chilli") || c.includes("chili")) return "green chilli";
+  return c;
+}
+
+async function getPriceAdvisory(commodity, state, district) {
   try {
+    commodity = normalizeCrop(clean(commodity));
+    state = clean(state);
+    district = clean(district);
+
+    const loc = normalizeLocation(district, state);
+    district = loc.district;
+    state = loc.state || state;
+
     if (!commodity) return "❌ Please provide a commodity.";
 
-    console.log("getPriceAdvisory called with:", commodity, state, district);
-    state = state && state.toLowerCase() !== "unknown" ? state : null;
-    district = district && district.toLowerCase() !== "unknown" ? district : null;
+    state = state && state.toLowerCase() !== "unknown" ? state.toLowerCase() : null;
+    district = district && district.toLowerCase() !== "unknown" ? district.toLowerCase() : null;
 
     let matches = [];
 
     if (state && district) {
       matches = cachedData.filter(
         (r) =>
-          r.Commodity?.toLowerCase() === commodity.toLowerCase() &&
-          r.State?.toLowerCase() === state.toLowerCase() &&
-          r.District?.toLowerCase() === district.toLowerCase()
+          r.Commodity?.toLowerCase() === commodity &&
+          r.State?.toLowerCase() === state &&
+          r.District?.toLowerCase() === district
       );
     }
+
     if (!matches.length && district) {
       matches = cachedData.filter(
         (r) =>
-          r.Commodity?.toLowerCase() === commodity.toLowerCase() &&
-          r.District?.toLowerCase() === district.toLowerCase()
+          r.Commodity?.toLowerCase() === commodity &&
+          r.District?.toLowerCase() === district
       );
     }
+
     if (!matches.length && state) {
       matches = cachedData.filter(
         (r) =>
-          r.Commodity?.toLowerCase() === commodity.toLowerCase() &&
-          r.State?.toLowerCase() === state.toLowerCase()
+          r.Commodity?.toLowerCase() === commodity &&
+          r.State?.toLowerCase() === state
       );
     }
 
     if (!matches.length) {
       matches = cachedData.filter(
-        (r) => r.Commodity?.toLowerCase() === commodity.toLowerCase()
+        (r) => r.Commodity?.toLowerCase() === commodity
       );
     }
 
@@ -65,19 +106,22 @@ export async function getPriceAdvisory(commodity, state, district) {
       }.`;
     }
 
-   return matches
-  .map(r =>
-    `📍 ${r.District}, ${r.State} - ${r.Market}\n` +
-    `🌾 ${r.Commodity}\n` +
-    `• Arrival Date: ${r.Arrival_Date}\n` +
-    `• Minimum: ₹${r.MinPrice} per quintal\n` +
-    `• Maximum: ₹${r.MaxPrice} per quintal\n` +
-    `• Modal: ₹${r.ModalPrice} per quintal\n`
-  )
-  .join("\n\n");
-
+    return matches
+      .slice(0, 5)
+      .map(
+        (r) =>
+          `📍 ${r.District}, ${r.State} - ${r.Market}\n` +
+          `🌾 ${r.Commodity}\n` +
+          `• Arrival Date: ${r.Arrival_Date}\n` +
+          `• Minimum: ₹${r.MinPrice} per quintal\n` +
+          `• Maximum: ₹${r.MaxPrice} per quintal\n` +
+          `• Modal: ₹${r.ModalPrice} per quintal`
+      )
+      .join("\n\n");
   } catch (error) {
     console.error("Error in getPriceAdvisory:", error.message);
     return "❌ Sorry, I faced an issue while fetching price data. Please try again later.";
   }
 }
+
+export { getPriceAdvisory };

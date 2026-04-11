@@ -8,45 +8,43 @@ export default function Chatbot() {
   const [voices, setVoices] = useState([]);
   const [selectedLang, setSelectedLang] = useState("en-US");
 
-  const BACKEND_URL = "https://your-backend-url.com/api/chat"; // 👈 replace with your backend
-
-  // 🔹 Dynamic quick action buttons with endpoint + type
+  const BACKEND_URL = "http://localhost:8000/api/chat";
   const quickActions = [
     {
       label: "Farming Tips",
       icon: <Leaf size={18} />,
       message: "Give me a farming tip",
-      url: "https://multilingual-ai-chatbot.onrender.com/api/chat",
+      url: "http://localhost:8000/api/chat",
       method: "POST",
-      type: "message", // expects { message }
+      type: "message",
     },
     {
       label: "Weather Summary",
       icon: <Info size={18} />,
       message: "weather alert for delhi",
-      url: "https://multilingual-ai-chatbot.onrender.com/weather/advisory",
+      url: "http://localhost:8000/weather/advisory",
       method: "POST",
-      type: "message", // expects { message }
+      type: "message", 
     },
     {
       label: "Mandi Prices",
       icon: <Eye size={18} />,
       message: "Tell me about price of bottlegourd",
-      url: "https://multilingual-ai-chatbot.onrender.com/price/advisory",
+      url: "http://localhost:8000/price/advisory",
       method: "POST",
-      type: "query", // expects { query, language }
+      type: "query",
     },
     {
       label: "More",
       icon: <MoreHorizontal size={18} />,
       message: "Show me more options",
-      url: "https://multilingual-ai-chatbot.onrender.com/api/chat",
+      url: "http://localhost:8000/api/chat",
       method: "POST",
       type: "message",
     },
   ];
 
-  // Load available voices
+
   useEffect(() => {
     const loadVoices = () => {
       setVoices(speechSynthesis.getVoices());
@@ -55,7 +53,7 @@ export default function Chatbot() {
     window.speechSynthesis.onvoiceschanged = loadVoices;
   }, []);
 
-  // 🔹 Send message to backend
+
   const sendMessage = async (
     customMessage,
     url = BACKEND_URL,
@@ -65,7 +63,7 @@ export default function Chatbot() {
     const userMessage = customMessage || input;
     if (!userMessage.trim()) return;
 
-    // Add user message to chat
+
     setMessages((prev) => [...prev, { text: userMessage, sender: "user" }]);
     setInput("");
 
@@ -73,10 +71,8 @@ export default function Chatbot() {
       let body = {};
 
       if (type === "query") {
-        // ✅ For mandi prices API
         body = { query: userMessage, language: "en" };
       } else {
-        // ✅ Default APIs
         body = { message: userMessage };
       }
 
@@ -106,12 +102,12 @@ export default function Chatbot() {
     }
   };
 
-  // Handle Enter key
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") sendMessage();
   };
 
-  // 🎤 Voice input
+
   const startListening = () => {
     if (!("webkitSpeechRecognition" in window)) {
       alert("Speech recognition not supported in this browser.");
@@ -135,7 +131,7 @@ export default function Chatbot() {
     recognition.start();
   };
 
-  // 🔊 Voice output
+
   const speakMessage = (message, lang) => {
     const utterance = new SpeechSynthesisUtterance(message);
     utterance.lang = lang;
@@ -148,12 +144,12 @@ export default function Chatbot() {
 
   return (
     <div className="flex flex-col h-[85vh] w-full max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden">
-      {/* Header */}
+
       <div className="p-3 sm:p-4 bg-green-600 text-white font-bold text-lg sm:text-xl text-center">
         Farming Assistant Chatbot 🌾
       </div>
 
-      {/* Quick Action Buttons */}
+
       <div className="flex flex-wrap gap-2 p-3 sm:p-4 justify-center">
         {quickActions.map((action, index) => (
           <button
@@ -171,7 +167,7 @@ export default function Chatbot() {
         ))}
       </div>
 
-      {/* Messages */}
+
       <div className="flex-1 p-3 sm:p-4 space-y-3 overflow-y-auto">
         {messages.map((msg, i) => (
           <div
@@ -187,7 +183,7 @@ export default function Chatbot() {
         ))}
       </div>
 
-      {/* Input Section */}
+
       <div className="p-2 sm:p-3 border-t border-gray-300 dark:border-gray-700 flex flex-col sm:flex-row items-center gap-2">
         <select
           className="w-full sm:w-auto p-2 rounded-lg border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
@@ -203,7 +199,7 @@ export default function Chatbot() {
         </select>
 
         <div className="flex items-center gap-2 w-full">
-          {/* Mic */}
+
           <button
             onClick={startListening}
             className={`p-2 rounded-full ${
@@ -216,7 +212,7 @@ export default function Chatbot() {
             <Mic size={20} />
           </button>
 
-          {/* Text Input */}
+
           <input
             type="text"
             value={input}
@@ -227,7 +223,7 @@ export default function Chatbot() {
                        dark:bg-gray-800 text-gray-900 dark:text-gray-100"
           />
 
-          {/* Send Button */}
+
           <button
             onClick={() => sendMessage()}
             className="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition"

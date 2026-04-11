@@ -17,7 +17,7 @@ export default function Chatbot() {
     window.speechSynthesis.onvoiceschanged = loadVoices;
   }, []);
 
-  // Send message
+
   const sendMessage = () => {
     if (!input.trim()) return;
     setMessages([...messages, { text: input, sender: "user" }]);
@@ -33,7 +33,7 @@ export default function Chatbot() {
     if (e.key === "Enter") sendMessage();
   };
 
-  // 🎤 Voice input
+
   const startListening = () => {
     if (!("webkitSpeechRecognition" in window)) {
       alert("Speech recognition not supported in this browser.");
@@ -57,7 +57,6 @@ export default function Chatbot() {
     recognition.start();
   };
 
-  // 🔊 Voice output
   const speakMessage = (message, lang) => {
     const utterance = new SpeechSynthesisUtterance(message);
     utterance.lang = lang;
