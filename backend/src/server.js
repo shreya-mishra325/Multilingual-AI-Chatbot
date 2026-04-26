@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import path from "path";
 import axios from "axios";
 dotenv.config();
 
@@ -13,16 +12,10 @@ import priceRoutes from "./routes/price.js";
 import chatbotRoutes from "./routes/chatbot.js";
 import pestRoutes from "./routes/pest.js";
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://multilingual-ai-chatbot-gigu.vercel.app"
-];
-
 app.use(express.json());
 app.use(cors({
-  origin: allowedOrigins,
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"],
+  origin: true,
+  credentials: true
 }));
 
 app.get("/", (req, res) => {
@@ -40,10 +33,8 @@ app.get("/models", async (req, res) => {
     );
     res.json(response.data);
   } catch (err) {
-    console.error("FULL ERROR:", err.response?.data || err.message);
-    res.status(500).json({
-      error: err.response?.data || err.message
-    });
+    console.error(err.response?.data || err.message);
+    res.status(500).json({ error: err.response?.data || err.message });
   }
 });
 
@@ -54,7 +45,7 @@ app.use("/api", chatbotRoutes);
 app.use("/api/pest", pestRoutes);
 
 app.use((err, req, res, next) => {
-  console.error("Server Error:", err.stack);
+  console.error(err.stack);
   res.status(500).json({ error: "Internal Server Error" });
 });
 
