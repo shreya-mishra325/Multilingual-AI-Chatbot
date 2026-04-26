@@ -12,26 +12,27 @@ import Chatbotpage from "./pages/Chatbotpage";
 
 function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-green-100 dark:from-gray-900 dark:to-gray-950 text-gray-800 dark:text-gray-200">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-green-50 to-green-100 dark:from-gray-900 dark:to-gray-950 text-gray-800 dark:text-gray-200">   
       <Navbar />
-      <Routes>
+      <div className="flex-1">
+        <Routes>
 
-        <Route
-          path="/"
-          element={
-            <>
-              <Hero />
-              <WeatherForecast/>
-              <QuickActions />
-            </>
-          }
-        />
-        
-        <Route path="/soil-analysis" element={<SoilAnalysisPage />} />
-        <Route path="/mandi-prices" element={<MandiPricesPage />} />
-        <Route path="/crop-guides" element={<CropGuidesPage />} />
-        <Route path="/chatbot" element={<Chatbotpage />} />
-      </Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <Hero />
+                <WeatherForecast/>
+                <QuickActions />
+              </>
+            }
+          />
+          <Route path="/soil-analysis" element={<SoilAnalysisPage />} />
+          <Route path="/mandi-prices" element={<MandiPricesPage />} />
+          <Route path="/crop-guides" element={<CropGuidesPage />} />
+          <Route path="/chatbot" element={<Chatbotpage />} />
+        </Routes>
+      </div>
       <Footer />
     </div>
   );
