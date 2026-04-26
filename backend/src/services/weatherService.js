@@ -12,11 +12,10 @@ async function getCoordinates(location) {
     const data = await res.json();
 
     if (!Array.isArray(data) || data.length === 0) return null;
-    const indianMatch = data.find(
-      (loc) => loc.country === "IN"
-    );
 
-    const bestMatch = indianMatch || data[0];
+    const bestMatch = data.find(loc =>
+      loc.name.toLowerCase() === location.toLowerCase()
+    ) || data.find(loc => loc.country === "IN") || data[0];
 
     return {
       lat: bestMatch.lat,

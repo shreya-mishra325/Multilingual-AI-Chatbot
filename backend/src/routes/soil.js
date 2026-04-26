@@ -44,7 +44,7 @@ router.post("/", async (req, res) => {
       }
     }
 
-    // 🔍 STEP 2: Build query
+
     const advisoryQuery = crop || soilType || village || query;
 
     if (!advisoryQuery) {
@@ -57,16 +57,16 @@ router.post("/", async (req, res) => {
       return res.status(400).send(reply);
     }
 
-    console.log("🌱 Soil Query:", advisoryQuery);
+    console.log("Soil Query:", advisoryQuery);
 
-    // 📊 STEP 3: Get base data
+
     let baseAdvice = await getSoilAdvisory(advisoryQuery);
 
     let advice;
 
-    // 🚀 STEP 4: DATA + AI Enhancement
+    
     if (!isGenericAdvice(baseAdvice)) {
-      console.log("✅ Using DATA + AI enhancement");
+      console.log("Using DATA + AI enhancement");
 
       advice = await getAIResponse(`
       You are an agricultural expert.
@@ -118,7 +118,7 @@ router.post("/", async (req, res) => {
       .setHeader("Content-Type", "text/plain")
       .send(advice);
   } catch (err) {
-    console.error("🔥 Soil route error:", err.message);
+    console.error("Soil route error:", err.message);
 
     try {
       let fallback = await getAIResponse(

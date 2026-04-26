@@ -1,8 +1,7 @@
 import fs from "fs";
-import path from "path";
 import { getAIResponse } from "./geminiService.js";
 
-const soilDataPath = path.join(process.cwd(), "src/data/soil.json");
+const soilDataPath = new URL("../data/soil.json", import.meta.url);
 const soilJson = JSON.parse(fs.readFileSync(soilDataPath, "utf-8"));
 
 const soilData = soilJson.soil_data;
@@ -35,8 +34,8 @@ async function getSoilAdvisory(query) {
       );
 
       return `📍 In ${foundLocation}, the soil is mostly ${soil.soil_type}.
-      🌱 Recommended crops: ${soil.crops.join(", ")}.
-      💡 Fertilizer tip: ${soil.fertilizers}${
+            🌱 Recommended crops: ${soil.crops.join(", ")}.
+            💡 Fertilizer tip: ${soil.fertilizers}${
         mentionedCrop ? `\n✅ Yes, "${mentionedCrop}" grows well here.` : ""
       }`;
     }

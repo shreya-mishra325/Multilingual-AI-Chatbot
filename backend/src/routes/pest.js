@@ -45,7 +45,7 @@ router.post("/ask", async (req, res) => {
 
     let finalResponse;
     if (!isGenericAdvice(baseAdvice)) {
-      console.log("✅ Using DATA + AI enhancement");
+      console.log("Using DATA + AI enhancement");
 
       finalResponse = await getAIResponse(`
         You are an agricultural expert.
@@ -65,7 +65,7 @@ router.post("/ask", async (req, res) => {
         - Use emojis 🐛 🌿 💡
         `);
     } else {
-      console.log("⚠️ Using AI fallback");
+      console.log("Using AI fallback");
 
       finalResponse = await getAIResponse(`
       You are a farming assistant.
@@ -100,7 +100,7 @@ router.post("/ask", async (req, res) => {
     return res.json({ response: finalResponse });
 
   } catch (err) {
-    console.error("🔥 Pest route error:", err.message);
+    console.error("Pest route error:", err.message);
 
     try {
       let fallback = await getAIResponse(

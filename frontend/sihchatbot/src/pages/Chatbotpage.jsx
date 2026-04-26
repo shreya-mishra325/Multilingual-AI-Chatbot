@@ -10,16 +10,18 @@ export default function Chatbotpage() {
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
-  const CHAT_API = "http://localhost:8000/api/chat";
-  const WEATHER_API = "http://localhost:8000/weather/advisory";
-  const PRICE_API = "http://localhost:8000/price/advisory";
-  const SOIL_API = "http://localhost:8000/soil";
+  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+  const CHAT_API = `${BASE_URL}/api/chat`;
+  const WEATHER_API = `${BASE_URL}/weather/advisory`;
+  const PRICE_API = `${BASE_URL}/price/advisory`;
+  const SOIL_API = `${BASE_URL}/soil`;
 
   const quickActions = [
     { label: "Farming Tips", icon: <Leaf size={18} />, type: "chat", url: CHAT_API, text: "Give me a farming tip" },
-    { label: "Weather Summary", icon: <Info size={18} />, type: "weather", url: WEATHER_API, text: "weather update" },
-    { label: "Mandi Prices", icon: <Eye size={18} />, type: "price", url: PRICE_API, text: "latest mandi prices" },
-    { label: "Soil Health", icon: <Leaf size={18} />, type: "soil", url: SOIL_API, text: "tell me about soil health" }
+    { label: "Weather Summary", icon: <Info size={18} />, type: "weather", url: WEATHER_API, text: "Chandigarh Weather Alert" },
+    { label: "Mandi Prices", icon: <Eye size={18} />, type: "price", url: PRICE_API, text: "Green Chilli prices in Chandigarh" },
+    { label: "Soil Health", icon: <Leaf size={18} />, type: "soil", url: SOIL_API, text: "soil type in chandigarh" }
   ];
 
   useEffect(() => {
@@ -27,6 +29,11 @@ export default function Chatbotpage() {
     loadVoices();
     speechSynthesis.onvoiceschanged = loadVoices;
   }, []);
+
+  const cleanText = (text) => {
+    if (!text) return "";
+    return text.replace(/\*/g, "");
+  };
 
   const sendMessage = async (customText, url = CHAT_API, type = "chat") => {
     if (loading) return;
@@ -37,9 +44,7 @@ export default function Chatbotpage() {
     setLoading(true);
     setInput("");
 
-    if (type === "chat") {
-      setMessages(prev => [...prev, { sender: "user", text: messageText }]);
-    }
+    setMessages(prev => [...prev, { sender: "user", text: messageText }]);
 
     try {
       let response;
@@ -50,23 +55,50 @@ export default function Chatbotpage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: messageText, language: selectedLang })
         });
-      } else {
+      } else if (type === "weather") {
+        const location = messageText
+          .toLowerCase()
+          .replace("weather", "")
+          .replace("alert", "")
+          .replace("in", "")
+          .trim();
+
         response = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query: messageText || "latest advisory", language: selectedLang })
+          body: JSON.stringify({ location, language: selectedLang })
+        });
+      }
+      else if (type === "price") {
+        response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: messageText, language: selectedLang })
+        });
+      }
+      else if (type === "soil") {
+        response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: messageText, language: selectedLang })
         });
       }
 
-      const data = await response.json();
-
       let text;
-      if (type === "chat") text = data.response || data.reply;
-      else if (type === "weather") text = data.advisory || data.response;
-      else if (type === "price") text = data.prices || data.response;
-      else if (type === "soil") text = data.response || data.advisory;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
 
-      if (!text) text = JSON.stringify(data, null, 2);
+        if (type === "chat") text = data.response || data.reply;
+        else if (type === "weather") text = data.advisory || data.response;
+        else if (type === "price") text = data.prices || data.response;
+        else if (type === "soil") text = data.response || data.advisory;
+
+        if (!text) text = JSON.stringify(data);
+      } else {
+        text = await response.text();
+      } 
+      text = cleanText(text);
 
       setMessages(prev => [...prev, { sender: "bot", text }]);
       speakMessage(text, selectedLang);
@@ -199,7 +231,7 @@ export default function Chatbotpage() {
         <button
           onClick={() => sendMessage()}
           className="cursor-pointer p-2 text-white rounded-full"
-          style={{ color: "white", backgroundColor: "#4f7942" }}
+          style={{ backgroundColor: "#4f7942" }}
         >
           <Send size={20} />
         </button>

@@ -1,9 +1,9 @@
 import fs from "fs";
-import path from "path";
 import csv from "csv-parser";
 
-const csvPath = path.join(process.cwd(), "src/data/price_data.csv");
+const csvPath = new URL("../data/price_data.csv", import.meta.url);
 let cachedData = [];
+let isLoaded = false;
 
 function loadCSV() {
   return new Promise((resolve, reject) => {
@@ -19,7 +19,12 @@ function loadCSV() {
   });
 }
 
-await loadCSV();
+async function ensureDataLoaded() {
+  if (!isLoaded) {
+    await loadCSV();
+    isLoaded = true;
+  }
+}
 
 const STATES = [
   "uttar pradesh",
@@ -54,6 +59,7 @@ function normalizeCrop(crop) {
 
 async function getPriceAdvisory(commodity, state, district) {
   try {
+    await ensureDataLoaded();
     commodity = normalizeCrop(clean(commodity));
     state = clean(state);
     district = clean(district);
@@ -108,8 +114,7 @@ async function getPriceAdvisory(commodity, state, district) {
 
     return matches
       .slice(0, 5)
-      .map(
-        (r) =>
+      .map((r) =>
           `📍 ${r.District}, ${r.State} - ${r.Market}\n` +
           `🌾 ${r.Commodity}\n` +
           `• Arrival Date: ${r.Arrival_Date}\n` +
@@ -124,4 +129,4 @@ async function getPriceAdvisory(commodity, state, district) {
   }
 }
 
-export { getPriceAdvisory };
+export {getPriceAdvisory};

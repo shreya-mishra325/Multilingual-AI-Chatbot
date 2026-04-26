@@ -14,11 +14,11 @@ export async function getAIResponse(prompt, context = {}) {
     const result = await model.generateContent(prompt);
     const text = result.response.text();
 
-    console.log("✅ Gemini success (primary)");
+    console.log("Gemini success (primary)");
     return text;
 
   } catch (error) {
-    console.error("🔥 Gemini Error (primary):", error.message);
+    console.error("Gemini Error (primary):", error.message);
     try {
       await delay(1000);
 
@@ -29,11 +29,11 @@ export async function getAIResponse(prompt, context = {}) {
       const retryResult = await retryModel.generateContent(prompt);
       const retryText = retryResult.response.text();
 
-      console.log("🔁 Gemini success (retry)");
+      console.log("Gemini success (retry)");
       return retryText;
 
     } catch (retryError) {
-      console.error("🔥 Gemini Retry Failed:", retryError.message);
+      console.error("Gemini Retry Failed:", retryError.message);
       try {
         const fallbackModel = genAI.getGenerativeModel({
           model: "gemini-flash-lite-latest"
@@ -42,12 +42,12 @@ export async function getAIResponse(prompt, context = {}) {
         const fallbackResult = await fallbackModel.generateContent(prompt);
         const fallbackText = fallbackResult.response.text();
 
-        console.log("🔄 Gemini success (fallback)");
+        console.log("Gemini success (fallback)");
         return fallbackText;
 
       } catch (fallbackError) {
-        console.error("🔥 Gemini Fallback Failed:", fallbackError.message);
-        return "⚠️ AI is currently busy. Please try again in a few seconds.";
+        console.error("Gemini Fallback Failed:", fallbackError.message);
+        return "AI is currently busy. Please try again in a few seconds.";
       }
     }
   }

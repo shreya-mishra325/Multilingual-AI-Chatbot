@@ -104,7 +104,7 @@ router.post("/advisory", async (req, res) => {
     state = clean(state) || "unknown";
     district = clean(district);
 
-    console.log("💰 FINAL VALUES:");
+    console.log("FINAL VALUES:");
     console.log("Commodity:", commodity);
     console.log("State:", state);
     console.log("District:", district);
@@ -129,7 +129,7 @@ router.post("/advisory", async (req, res) => {
       .send(advisory);
 
   } catch (err) {
-    console.error("🔥 Price route error:", err.message);
+    console.error("Price route error:", err.message);
 
     try {
       let fallback = await getAIResponse(`

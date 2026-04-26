@@ -1,12 +1,9 @@
 import express from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import path from "path";
 import axios from "axios";
-dotenv.config({
-  path: path.resolve("../.env")
-});
+dotenv.config();
 
 const app = express();
 
@@ -29,12 +26,13 @@ app.use(cors({
 }));
 
 app.get("/", (req, res) => {
-  res.send("🌾 Welcome to the Smart Farming Advisory API!");
+  res.send("Welcome to the Smart Farming Advisory API!");
 });
 
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
+
 app.get("/models", async (req, res) => {
   try {
     const response = await axios.get(
@@ -42,7 +40,7 @@ app.get("/models", async (req, res) => {
     );
     res.json(response.data);
   } catch (err) {
-    console.error("🔥 FULL ERROR:", err.response?.data || err.message);
+    console.error("FULL ERROR:", err.response?.data || err.message);
     res.status(500).json({
       error: err.response?.data || err.message
     });
@@ -56,11 +54,15 @@ app.use("/api", chatbotRoutes);
 app.use("/api/pest", pestRoutes);
 
 app.use((err, req, res, next) => {
-  console.error("🔥 Server Error:", err.stack);
+  console.error("Server Error:", err.stack);
   res.status(500).json({ error: "Internal Server Error" });
 });
 
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+export default app;
